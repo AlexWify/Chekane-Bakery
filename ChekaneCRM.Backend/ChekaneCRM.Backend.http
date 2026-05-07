@@ -1,0 +1,6 @@
+@ChekaneCRM.Backend_HostAddress = http://localhost:5283
+
+GET {{ChekaneCRM.Backend_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
