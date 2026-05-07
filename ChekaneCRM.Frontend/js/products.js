@@ -6,7 +6,8 @@ let editingProductId = null;
 async function renderProducts() {
     const products = await loadProducts();
     const app = document.getElementById('app');
-    const canManage = currentUser && (currentUser.roleId === 1);
+    // Теперь админ И пекарь (roleId === 1 или 3) могут управлять товарами
+    const canManage = currentUser && (currentUser.roleId === 1 || currentUser.roleId === 3);
     
     app.innerHTML = `
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
@@ -48,7 +49,6 @@ async function renderProducts() {
         </div>
     `).join('');
 }
-
 
 // Показать форму добавления товара
 function showAddProductForm() {
@@ -197,7 +197,7 @@ async function deleteProduct(productId) {
 }
 
 async function toggleProductAvailability(id) {
-    if (!currentUser || (currentUser.roleId !== 1 && currentUser.roleId !== 2)) {
+    if (!currentUser || (currentUser.roleId !== 1 && currentUser.roleId !== 2 && currentUser.roleId !== 3)) {
         showToast('⛔ Нет прав для этого действия', 'warning');
         return;
     }
@@ -208,3 +208,9 @@ async function toggleProductAvailability(id) {
         showToast('❌ Ошибка: ' + error.message, 'error');
     }
 }
+
+// Глобальные функции
+window.showAddProductForm = showAddProductForm;
+window.editProduct = editProduct;
+window.deleteProduct = deleteProduct;
+window.toggleProductAvailability = toggleProductAvailability;
