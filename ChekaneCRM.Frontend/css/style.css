@@ -47,3 +47,81 @@ button:hover, .btn:hover { transform: scale(1.02); box-shadow: 0 0 10px rgba(217
 .users-table { width: 100%; border-collapse: collapse; background: #0a0a0a; border-radius: 15px; }
 .users-table th, .users-table td { padding: 0.8rem; text-align: left; border-bottom: 1px solid #d9b8ff; }
 .users-table th { background: linear-gradient(135deg, #d9b8ff, #ff6b9d); color: #000; }
+
+/* Toast уведомления */
+.toast {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    padding: 12px 24px;
+    border-radius: 12px;
+    color: white;
+    font-weight: bold;
+    z-index: 9999;
+    opacity: 0;
+    transform: translateX(100%);
+    transition: all 0.3s ease;
+    max-width: 350px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+}
+
+.toast.show {
+    opacity: 1;
+    transform: translateX(0);
+}
+
+.toast-success {
+    background: linear-gradient(135deg, #00b894, #009432);
+}
+
+.toast-error {
+    background: linear-gradient(135deg, #ff4757, #ff6b81);
+}
+
+.toast-warning {
+    background: linear-gradient(135deg, #ffa502, #e67e22);
+}
+
+.toast-info {
+    background: linear-gradient(135deg, #1e90ff, #3742fa);
+}
+
+.empty-cart {
+    text-align: center;
+    padding: 3rem;
+    background: #0a0a0a;
+    border-radius: 20px;
+    margin-top: 2rem;
+}
+
+.empty-cart p {
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+    color: #d9b8ff;
+}
+/* Формы для товаров */
+textarea {
+    width: 100%;
+    padding: 0.8rem;
+    margin-bottom: 1rem;
+    background: #1a1a1a;
+    border: 1px solid #d9b8ff;
+    border-radius: 12px;
+    color: white;
+    font-family: inherit;
+    resize: vertical;
+}
+
+input[type="checkbox"] {
+    width: auto;
+    margin-right: 0.5rem;
+}
+
+label {
+    cursor: pointer;
+}
+
+/* Кнопки действий на карточках */
+.product-card button:first-child {
+    margin-right: 0.5rem;
+}
