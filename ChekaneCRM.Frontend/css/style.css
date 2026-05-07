@@ -125,3 +125,65 @@ label {
 .product-card button:first-child {
     margin-right: 0.5rem;
 }
+/* Таблица заказов */
+.orders-table {
+    width: 100%;
+    border-collapse: collapse;
+    background: #0a0a0a;
+    border-radius: 15px;
+    overflow: hidden;
+}
+
+.orders-table th,
+.orders-table td {
+    padding: 1rem;
+    text-align: left;
+    border-bottom: 1px solid #d9b8ff;
+    vertical-align: top;
+}
+
+.orders-table th {
+    background: linear-gradient(135deg, #d9b8ff, #ff6b9d);
+    color: #000;
+    font-weight: bold;
+    position: sticky;
+    top: 0;
+}
+
+.orders-table tr:hover {
+    background: rgba(217, 184, 255, 0.1);
+}
+
+.order-products-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.3rem;
+}
+
+.order-product-item {
+    font-size: 0.9rem;
+    color: #ccc;
+    border-left: 2px solid #d9b8ff;
+    padding-left: 0.5rem;
+}
+
+/* Фильтры */
+#dateFilter {
+    cursor: pointer;
+}
+
+#dateFilter::-webkit-calendar-picker-indicator {
+    filter: invert(1);
+    cursor: pointer;
+}
+
+/* Кнопка экспорта */
+.btn-export {
+    background: linear-gradient(135deg, #00b894, #009432);
+    margin-left: 0.5rem;
+}
+
+.btn-export:hover {
+    transform: scale(1.02);
+    box-shadow: 0 0 10px rgba(0, 184, 148, 0.6);
+}
