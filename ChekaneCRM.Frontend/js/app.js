@@ -11,6 +11,11 @@ if (savedCart) {
 }
 
 // Глобальные функции для HTML
+window.showAddProductForm = showAddProductForm;
+window.editProduct = editProduct;
+window.deleteProduct = deleteProduct;
+window.createProduct = createProduct;
+window.updateProduct = updateProduct;
 window.changePage = changePage;
 window.addToCart = addToCart;
 window.removeFromCart = removeFromCart;
