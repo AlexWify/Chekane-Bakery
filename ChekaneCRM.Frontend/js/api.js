@@ -71,8 +71,10 @@ async function loadStaff() {
     return await apiRequest('/users/staff');
 }
 
+// ИСПРАВЛЕНО: отправляем просто число, а не объект
 async function updateUserRole(userId, roleId) {
     console.log(`Отправляем смену роли: userId=${userId}, roleId=${roleId}`);
+    // ВАЖНО: отправляем просто число roleId, НЕ объект { roleId: roleId }
     return await apiRequest(`/users/${userId}/role`, 'PATCH', roleId);
 }
 
@@ -97,4 +99,8 @@ async function updateProduct(productId, productData) {
 // Удаление товара (только админ)
 async function deleteProduct(productId) {
     return await apiRequest(`/products/${productId}`, 'DELETE');
+}
+// Удаление заказа (только админ)
+async function deleteOrder(orderId) {
+    return await apiRequest(`/orders/${orderId}`, 'DELETE');
 }
