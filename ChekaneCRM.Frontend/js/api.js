@@ -2,16 +2,36 @@
 async function apiRequest(url, method = 'GET', body = null) {
     const options = {
         method,
-        headers: { 'Content-Type': 'application/json' }
+        headers: { 
+            'Content-Type': 'application/json'
+        }
     };
-    if (body) options.body = JSON.stringify(body);
     
-    const response = await fetch(`${API_URL}${url}`, options);
-    if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || 'Ошибка запроса');
+    // ВАЖНО: если body не null, преобразуем в JSON
+    if (body !== null && body !== undefined) {
+        options.body = JSON.stringify(body);
     }
-    return response.json();
+    
+    console.log(`API Request: ${method} ${url}`, body); // Для отладки
+    
+    try {
+        const response = await fetch(`${API_URL}${url}`, options);
+        
+        if (!response.ok) {
+            let errorMessage = `Ошибка ${response.status}`;
+            try {
+                const error = await response.json();
+                errorMessage = error.message || error.title || errorMessage;
+                console.error('Детали ошибки:', error);
+            } catch(e) {}
+            throw new Error(errorMessage);
+        }
+        
+        return await response.json();
+    } catch (error) {
+        console.error('API Error:', error);
+        throw error;
+    }
 }
 
 // Товары
@@ -20,7 +40,8 @@ async function loadProducts() {
 }
 
 async function toggleProductAvailability(id) {
-    return await apiRequest(`/products/${id}/toggle`, 'PATCH');
+    // Для toggle отправляем пустой объект или ничего
+    return await apiRequest(`/products/${id}/toggle`, 'PATCH', {});
 }
 
 // Заказы
@@ -36,10 +57,12 @@ async function createOrder(orderData) {
 }
 
 async function updateOrderStatus(orderId, status) {
+    // С что ожидает бэкенд
+    //  оставляем как объект
     return await apiRequest(`/orders/${orderId}/status`, 'PATCH', { status });
 }
 
-// Пользователи
+// пользователи
 async function loadUsers() {
     return await apiRequest('/users');
 }
@@ -47,8 +70,11 @@ async function loadUsers() {
 async function loadStaff() {
     return await apiRequest('/users/staff');
 }
-
-async function changeUserRole(userId, roleId) {
+//
+// ИСПРАВЛЕНО: отправляем просто число, а не объект
+async function updateUserRole(userId, roleId) {
+    console.log(`Отправляем смену роли: userId=${userId}, roleId=${roleId}`);
+    // ВАЖНО: отправляем просто число roleId, НЕ объект { roleId: roleId }
     return await apiRequest(`/users/${userId}/role`, 'PATCH', roleId);
 }
 
