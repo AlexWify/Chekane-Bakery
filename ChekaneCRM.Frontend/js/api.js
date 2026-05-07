@@ -57,12 +57,12 @@ async function createOrder(orderData) {
 }
 
 async function updateOrderStatus(orderId, status) {
-    // С что ожидает бэкенд
-    //  оставляем как объект
+    // Статус отправляем как простое число? Строку? Смотрим что ожидает бэкенд
+    // Пока оставляем как объект, если не заработает - исправим
     return await apiRequest(`/orders/${orderId}/status`, 'PATCH', { status });
 }
 
-// пользователи
+// Пользователи
 async function loadUsers() {
     return await apiRequest('/users');
 }
@@ -70,11 +70,9 @@ async function loadUsers() {
 async function loadStaff() {
     return await apiRequest('/users/staff');
 }
-//
-// ИСПРАВЛЕНО: отправляем просто число, а не объект
+
 async function updateUserRole(userId, roleId) {
     console.log(`Отправляем смену роли: userId=${userId}, roleId=${roleId}`);
-    // ВАЖНО: отправляем просто число roleId, НЕ объект { roleId: roleId }
     return await apiRequest(`/users/${userId}/role`, 'PATCH', roleId);
 }
 
@@ -85,4 +83,18 @@ async function loginUser(login, password) {
 
 async function registerUser(userData) {
     return await apiRequest('/auth/register', 'POST', userData);
+}
+// Добавление товара (только админ)
+async function createProduct(productData) {
+    return await apiRequest('/products', 'POST', productData);
+}
+
+// Обновление товара (только админ)
+async function updateProduct(productId, productData) {
+    return await apiRequest(`/products/${productId}`, 'PUT', productData);
+}
+
+// Удаление товара (только админ)
+async function deleteProduct(productId) {
+    return await apiRequest(`/products/${productId}`, 'DELETE');
 }
