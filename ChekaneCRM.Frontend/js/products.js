@@ -1,10 +1,12 @@
 // Страница товаров
-let editingProductId = null; // Для отслеживания редактируемого товара
+console.log('products.js загружен');
+
+let editingProductId = null;
 
 async function renderProducts() {
     const products = await loadProducts();
     const app = document.getElementById('app');
-    const canManage = currentUser && (currentUser.roleId === 1); // Только админ
+    const canManage = currentUser && (currentUser.roleId === 1);
     
     app.innerHTML = `
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
@@ -46,6 +48,7 @@ async function renderProducts() {
         </div>
     `).join('');
 }
+
 
 // Показать форму добавления товара
 function showAddProductForm() {
