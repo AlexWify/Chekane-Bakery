@@ -11,6 +11,33 @@ if (savedCart) {
 }
 
 // Глобальные функции для HTML
+window.changePage = changePage;
+window.addToCart = addToCart;
+window.removeFromCart = removeFromCart;
+window.updateQuantity = updateQuantity;
+window.checkout = checkout;
+window.toggleProductAvailability = toggleProductAvailability;
+window.updateOrderStatus = updateOrderStatus;
+window.changeUserRole = changeUserRole;
+window.showLoginPage = showLoginPage;
+window.showRegisterPage = showRegisterPage;
+window.logout = logout;
+window.renderUsers = renderUsers;
+window.renderStaff = renderStaff;
+window.renderCart = renderCart;
+window.renderOrders = renderOrders; 
+window.renderAdmin = renderAdmin;
+window.renderHome = renderHome;
+window.renderProducts = renderProducts;
+window.deleteOrder = deleteOrder;
+window.filterOrdersByDate = filterOrdersByDate;
+window.clearDateFilter = clearDateFilter;
+window.exportOrdersToCSV = exportOrdersToCSV;
+window.filterOrdersByDate = filterOrdersByDate;
+window.clearDateFilter = clearDateFilter;
+window.deleteOrder = deleteOrder;
+window.exportOrdersToCSV = exportOrdersToCSV;
+window.formatDateTime = formatDateTime;
 window.showAddProductForm = showAddProductForm;
 window.editProduct = editProduct;
 window.deleteProduct = deleteProduct;
@@ -29,7 +56,8 @@ window.showRegisterPage = showRegisterPage;
 window.logout = logout;
 window.renderUsers = renderUsers;
 window.renderStaff = renderStaff;
-window.renderCart = renderCart; // ДОБАВЛЕНО
+window.renderCart = renderCart;
+
 
 // Запуск
 renderNav();
