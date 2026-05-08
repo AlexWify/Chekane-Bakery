@@ -89,14 +89,26 @@ namespace ChekaneCRM.Backend.Controllers
         }
 
         [HttpPatch("{orderId}/status")]
-        public async Task<IActionResult> UpdateStatus(int orderId, [FromBody] StatusUpdateRequest request)
+        public async Task<IActionResult> UpdateStatus(int orderId, [FromBody] string status)
         {
-            var order = await _db.Orders.FindAsync(orderId);
-            if (order == null) return NotFound();
-            
-            order.Status = request.Status;
-            await _db.SaveChangesAsync();
-            return Ok(new { success = true, status = order.Status });
+            try
+            {
+                var order = await _db.Orders.FindAsync(orderId);
+                if (order == null) 
+                    return NotFound(new { message = "Заказ не найден" });
+                
+                if (string.IsNullOrEmpty(status))
+                    return BadRequest(new { message = "Статус не может быть пустым" });
+                
+                order.Status = status;
+                await _db.SaveChangesAsync();
+                
+                return Ok(new { success = true, status = order.Status });
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, new { message = "Ошибка: " + ex.Message });
+            }
         }
     }
 
@@ -111,10 +123,5 @@ namespace ChekaneCRM.Backend.Controllers
     {
         public int ProductId { get; set; }
         public int Quantity { get; set; }
-    }
-
-    public class StatusUpdateRequest
-    {
-        public string Status { get; set; } = string.Empty;
     }
 }
