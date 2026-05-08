@@ -1,4 +1,3 @@
-// products.js
 console.log('products.js загружен');
 
 let editingProductId = null;
