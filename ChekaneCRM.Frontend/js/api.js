@@ -6,8 +6,11 @@ async function apiRequest(url, method = 'GET', body = null) {
             'Content-Type': 'application/json'
         }
     };
+async function loginByPhone(phone, password) {
+    return await apiRequest('/auth/login-by-phone', 'POST', { phone, password });
+}
     
-    // ВАЖНО: если body не null, преобразуем в JSON
+    // если body не null, преобразуем в JSON
     if (body !== null && body !== undefined) {
         options.body = JSON.stringify(body);
     }
@@ -40,7 +43,7 @@ async function loadProducts() {
 }
 
 async function toggleProductAvailability(id) {
-    // Для toggle отправляем пустой объект или ничего
+    //  toggle отправляем пустой объект или ничего
     return await apiRequest(`/products/${id}/toggle`, 'PATCH', {});
 }
 
@@ -57,8 +60,6 @@ async function createOrder(orderData) {
 }
 
 async function updateOrderStatus(orderId, status) {
-    // Статус отправляем как простое число? Строку? Смотрим что ожидает бэкенд
-    // Пока оставляем как объект, если не заработает - исправим
     return await apiRequest(`/orders/${orderId}/status`, 'PATCH', { status });
 }
 
@@ -71,10 +72,8 @@ async function loadStaff() {
     return await apiRequest('/users/staff');
 }
 
-// ИСПРАВЛЕНО: отправляем просто число, а не объект
 async function updateUserRole(userId, roleId) {
     console.log(`Отправляем смену роли: userId=${userId}, roleId=${roleId}`);
-    // ВАЖНО: отправляем просто число roleId, НЕ объект { roleId: roleId }
     return await apiRequest(`/users/${userId}/role`, 'PATCH', roleId);
 }
 
