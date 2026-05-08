@@ -28,7 +28,7 @@ namespace ChekaneCRM.Backend.Data
                 .HasOne(o => o.Client)
                 .WithMany()
                 .HasForeignKey(o => o.ClientId)
-                .OnDelete(DeleteBehavior.Cascade);  // ВАЖНО: Cascade вместо Restrict
+                .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<Order>()
                 .HasOne(o => o.Admin)
@@ -51,21 +51,21 @@ namespace ChekaneCRM.Backend.Data
             );
 
             // Админ
-modelBuilder.Entity<User>().HasData(
-    new User
-    {
-        Id = 1,
-        Surname = "Иванов",
-        Name = "Админ",
-        Phone = "79991234567",  
-        Email = "admin@chekane.ru",
-        Login = "admin",
-        Password = "123",
-        RoleId = 1
-    }
-);
+            modelBuilder.Entity<User>().HasData(
+                new User
+                {
+                    Id = 1,
+                    Surname = "Иванов",
+                    Name = "Админ",
+                    Phone = "79991234567",
+                    Email = "admin@chekane.ru",
+                    Login = "admin",
+                    Password = "Dde303dde",  
+                    RoleId = 1
+                }
+            );
 
-            // Товары
+            // Товары 
             modelBuilder.Entity<Product>().HasData(
                 new Product { Id = 1, Name = "Круассан", Description = "Слоеный с маслом", Price = 120, Category = "Булочки", IsAvailable = true },
                 new Product { Id = 2, Name = "Багет", Description = "Хрустящий французский", Price = 80, Category = "Хлеб", IsAvailable = true },
