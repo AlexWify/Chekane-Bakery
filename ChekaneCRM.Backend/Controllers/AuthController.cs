@@ -32,7 +32,7 @@ namespace ChekaneCRM.Backend.Controllers
                 return Unauthorized(new { message = "Неверный номер телефона или пароль" });
             }
 
-            Console.WriteLine($"Пользователь найден: {user.Name}");
+            Console.WriteLine($"Пользователь найден: {user.Name}, роль: {user.RoleId}");
 
             return Ok(new
             {
@@ -66,13 +66,13 @@ namespace ChekaneCRM.Backend.Controllers
                 Email = request.Email,
                 Login = request.Login ?? request.Phone,
                 Password = request.Password,
-                RoleId = 1  
+                RoleId = 4  /
             };
 
             _db.Users.Add(user);
             await _db.SaveChangesAsync();
 
-            Console.WriteLine($"Создан пользователь: {user.Name}, телефон: {user.Phone}, роль: {user.RoleId}");
+            Console.WriteLine($"Создан пользователь: {user.Name}, телефон: {user.Phone}, роль: {user.RoleId} (клиент)");
 
             return Ok(new { message = "Регистрация успешна" });
         }
