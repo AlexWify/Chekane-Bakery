@@ -68,6 +68,67 @@ namespace ChekaneCRM.Backend.Controllers
             return Ok(new { success = true, message = "Роль изменена" });
         }
 
+        [HttpPut("{id}")]
+        public async Task<IActionResult> UpdateUser(int id, [FromBody] UserUpdateRequest request)
+        {
+            var user = await _db.Users.FindAsync(id);
+            if (user == null) return NotFound(new { message = "Пользователь не найден" });
+            
+            user.Name = request.Name;
+            user.Surname = request.Surname;
+            user.Email = request.Email;
+            user.Login = request.Login;
+            
+            if (!string.IsNullOrEmpty(request.Password))
+            {
+                user.Password = request.Password;
+            }
+            
+            await _db.SaveChangesAsync();
+            return Ok(new { success = true, message = "Пользователь обновлён" });
+        }
+
+        [HttpDelete("{id}")]
+public async Task<IActionResult> DeleteUser(int id)
+{
+    try
+    {
+        var user = await _db.Users.FindAsync(id);
+        if (user == null) 
+            return NotFound(new { message = "Пользователь не найден" });
+        
+        // Получаем все заказы пользователя
+        var orders = await _db.Orders
+            .Where(o => o.ClientId == id)
+            .ToListAsync();
+        
+        foreach (var order in orders)
+        {
+            // Получаем товары для каждого заказа
+            var orderProducts = await _db.OrderProducts
+                .Where(op => op.OrderId == order.Id)
+                .ToListAsync();
+            
+            _db.OrderProducts.RemoveRange(orderProducts);
+        }
+        
+        _db.Orders.RemoveRange(orders);
+        
+        // Сохраняем изменения перед удалением пользователя
+        await _db.SaveChangesAsync();
+        
+        // Удаляем пользователя
+        _db.Users.Remove(user);
+        await _db.SaveChangesAsync();
+        
+        return Ok(new { success = true, message = "Пользователь удалён" });
+    }
+    catch (Exception ex)
+    {
+        return BadRequest(new { message = "Ошибка: " + ex.Message });
+    }
+}
+
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] UserCreateRequest request)
         {
@@ -113,5 +174,14 @@ namespace ChekaneCRM.Backend.Controllers
         public string Email { get; set; } = string.Empty;
         public string Login { get; set; } = string.Empty;
         public string Password { get; set; } = string.Empty;
+    }
+
+    public class UserUpdateRequest
+    {
+        public string Name { get; set; } = string.Empty;
+        public string Surname { get; set; } = string.Empty;
+        public string Email { get; set; } = string.Empty;
+        public string Login { get; set; } = string.Empty;
+        public string? Password { get; set; }
     }
 }
