@@ -1,24 +1,46 @@
+// auth-pages.js - вход по телефону
 function showLoginPage() {
     currentPage = 'login';
     renderNav();
     document.getElementById('app').innerHTML = `
         <div class="auth-page">
             <h2>🔐 Вход в систему</h2>
-            <input type="text" id="loginInput" placeholder="Логин">
-            <input type="password" id="passwordInput" placeholder="Пароль">
-            <button id="loginButton">Войти</button>
+            <input type="tel" id="phoneInput" placeholder="Номер телефона (11 цифр)" style="width:100%; padding:0.8rem; margin-bottom:1rem; background:#1a1a1a; border:1px solid #d9b8ff; border-radius:12px; color:white;">
+            <input type="password" id="passwordInput" placeholder="Пароль" style="width:100%; padding:0.8rem; margin-bottom:1rem; background:#1a1a1a; border:1px solid #d9b8ff; border-radius:12px; color:white;">
+            <div id="loginErrors" style="color: #ff8888; font-size: 0.8rem; margin: 0.5rem 0;"></div>
+            <button id="loginButton" style="width:100%; padding:0.8rem; background: linear-gradient(135deg, #d9b8ff, #ff6b9d); border:none; border-radius:30px; font-weight:bold; cursor:pointer;">Войти</button>
             <p style="text-align:center; margin-top:1rem;">Нет аккаунта? <a onclick="showRegisterPage()" style="color:#d9b8ff; cursor:pointer;">Зарегистрироваться</a></p>
-            <hr><p style="text-align:center; font-size:0.8rem;">Тестовый админ: admin / 123</p>
         </div>
     `;
     
     const loginBtn = document.getElementById('loginButton');
     if (loginBtn) {
         loginBtn.onclick = () => {
-            const loginVal = document.getElementById('loginInput').value;
-            const passwordVal = document.getElementById('passwordInput').value;
-            if (loginVal && passwordVal) login(loginVal, passwordVal);
-            else showToast('Заполните все поля', 'warning');
+            let phone = document.getElementById('phoneInput').value.trim();
+            const password = document.getElementById('passwordInput').value;
+            const errorsDiv = document.getElementById('loginErrors');
+            errorsDiv.innerHTML = '';
+            
+            // Очищаем телефон от нецифр
+            const phoneClean = phone.replace(/\D/g, '');
+            
+            if (phoneClean.length === 0) {
+                errorsDiv.innerHTML = '❌ Введите номер телефона';
+                return;
+            }
+            
+            if (phoneClean.length !== 11) {
+                errorsDiv.innerHTML = '❌ Номер телефона должен содержать 11 цифр';
+                return;
+            }
+            
+            if (!password) {
+                errorsDiv.innerHTML = '❌ Введите пароль';
+                return;
+            }
+            
+            // вызываем loginByPhone, а не login
+            loginByPhone(phoneClean, password);
         };
     }
 }
@@ -31,9 +53,8 @@ function showRegisterPage() {
             <h2>📝 Регистрация</h2>
             <input type="text" id="nameInput" placeholder="Имя">
             <input type="text" id="surnameInput" placeholder="Фамилия">
-            <input type="text" id="phoneInput" placeholder="Телефон (11 цифр)">
+            <input type="tel" id="phoneInput" placeholder="Телефон (11 цифр, например: 79123456789)">
             <input type="email" id="emailInput" placeholder="Email (должен содержать @gmail)">
-            <input type="text" id="loginInput" placeholder="Логин">
             <input type="password" id="passwordInput" placeholder="Пароль (8+ символов, заглавные и строчные)">
             <input type="password" id="passwordConfirmInput" placeholder="Подтверждение пароля">
             <div id="validationErrors" style="color: #ff8888; font-size: 0.8rem; margin: 0.5rem 0;"></div>
@@ -87,7 +108,6 @@ async function validateAndRegister() {
     const surname = document.getElementById('surnameInput').value.trim();
     const phone = document.getElementById('phoneInput').value.trim();
     const email = document.getElementById('emailInput').value.trim();
-    const login = document.getElementById('loginInput').value.trim();
     const password = document.getElementById('passwordInput').value;
     const passwordConfirm = document.getElementById('passwordConfirmInput').value;
     
@@ -119,8 +139,8 @@ async function validateAndRegister() {
         return;
     }
     
-    if (!name || !surname || !phone || !email || !login) {
-        errorsDiv.innerHTML = '<div>❌ Заполните все поля</div>';
+    if (!name || !surname || !phone || !email) {
+        errorsDiv.innerHTML = '<div>❌ Заполните все обязательные поля</div>';
         return;
     }
     
@@ -129,7 +149,7 @@ async function validateAndRegister() {
         surname: surname,
         phone: phoneClean,
         email: email,
-        login: login,
+        login: phoneClean,
         password: password
     };
     
@@ -144,4 +164,3 @@ async function validateAndRegister() {
 
 window.showLoginPage = showLoginPage;
 window.showRegisterPage = showRegisterPage;
-window.validateAndRegister = validateAndRegister;
