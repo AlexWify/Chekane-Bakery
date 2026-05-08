@@ -1,5 +1,5 @@
-// Главный файл приложения
-// Загружаем сохранённые данные
+console.log('app.js загружен');
+
 const savedUser = localStorage.getItem('user');
 if (savedUser) {
     try { currentUser = JSON.parse(savedUser); } catch(e) {}
@@ -40,8 +40,12 @@ window.editProduct = editProduct;
 window.deleteProduct = deleteProduct;
 window.createProduct = createProduct;
 window.updateProduct = updateProduct;
-window.deleteUserByAdmin = deleteUserByAdmin;
-window.loginByPhone = loginByPhone;  
+window.loginByPhone = loginByPhone;
+window.openProductDetails = openProductDetails;
+window.searchProducts = searchProducts;
+window.clearSearch = clearSearch;
+window.searchUsers = searchUsers;
+window.clearUserSearch = clearUserSearch;
 
 // Запуск
 renderNav();
