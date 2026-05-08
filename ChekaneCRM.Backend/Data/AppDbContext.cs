@@ -23,11 +23,12 @@ namespace ChekaneCRM.Backend.Data
                 .Property(o => o.TotalPrice)
                 .HasPrecision(18, 2);
 
+            // КАСКАДНОЕ УДАЛЕНИЕ - при удалении пользователя удаляются все его заказы
             modelBuilder.Entity<Order>()
                 .HasOne(o => o.Client)
                 .WithMany()
                 .HasForeignKey(o => o.ClientId)
-                .OnDelete(DeleteBehavior.Restrict);
+                .OnDelete(DeleteBehavior.Cascade);  // ВАЖНО: Cascade вместо Restrict
 
             modelBuilder.Entity<Order>()
                 .HasOne(o => o.Admin)
@@ -41,14 +42,6 @@ namespace ChekaneCRM.Backend.Data
                 .HasForeignKey(op => op.OrderId)
                 .OnDelete(DeleteBehavior.Cascade);
 
-            //  КАСКАДНОЕ УДАЛЕНИЕ ДЛЯ ПОЛЬЗОВАТЕЛЯ 
-            // При удалении пользователя, все его заказы удаляются каскадно
-            modelBuilder.Entity<Order>()
-                .HasOne(o => o.Client)
-                .WithMany()
-                .HasForeignKey(o => o.ClientId)
-                .OnDelete(DeleteBehavior.Cascade);  // Изменено с Restrict на Cascade
-
             // Роли
             modelBuilder.Entity<Role>().HasData(
                 new Role { Id = 1, Name = "admin" },
@@ -58,19 +51,19 @@ namespace ChekaneCRM.Backend.Data
             );
 
             // Админ
-            modelBuilder.Entity<User>().HasData(
-                new User
-                {
-                    Id = 1,
-                    Surname = "Иванов",
-                    Name = "Админ",
-                    Phone = "000",
-                    Email = "admin@chekane.ru",
-                    Login = "admin",
-                    Password = "123",
-                    RoleId = 1
-                }
-            );
+modelBuilder.Entity<User>().HasData(
+    new User
+    {
+        Id = 1,
+        Surname = "Иванов",
+        Name = "Админ",
+        Phone = "79991234567",  
+        Email = "admin@chekane.ru",
+        Login = "admin",
+        Password = "123",
+        RoleId = 1
+    }
+);
 
             // Товары
             modelBuilder.Entity<Product>().HasData(
