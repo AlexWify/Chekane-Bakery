@@ -1,91 +1,90 @@
-// Страница пользователей (админ)
+// users.js - с красивыми смайликами в выпадающем списке
 async function renderUsers() {
     if (!currentUser || currentUser.roleId !== 1) {
         changePage('home');
         return;
     }
     
-    try {
-        const users = await loadUsers();
-        const app = document.getElementById('app');
+    const users = await loadUsers();
+    const app = document.getElementById('app');
+    
+    app.innerHTML = `
+        <div style="display: flex; gap: 1rem; margin-bottom: 1rem;">
+            <button class="btn" onclick="changePage('admin')">◀ Назад</button>
+            <button class="btn" onclick="renderUsers()">👥 Пользователи</button>
+            <button class="btn" onclick="renderStaff()">👨‍🍳 Сотрудники</button>
+        </div>
+        <h2>👥 Все пользователи</h2>
+        <div style="overflow-x: auto;">
+            <table class="users-table" style="width: 100%; border-collapse: collapse;">
+                <thead>
+                    <tr>
+                        <th style="padding: 12px; background: linear-gradient(135deg, #d9b8ff, #ff6b9d); color: black;">ID</th>
+                        <th style="padding: 12px; background: linear-gradient(135deg, #d9b8ff, #ff6b9d); color: black;">Имя</th>
+                        <th style="padding: 12px; background: linear-gradient(135deg, #d9b8ff, #ff6b9d); color: black;">Фамилия</th>
+                        <th style="padding: 12px; background: linear-gradient(135deg, #d9b8ff, #ff6b9d); color: black;">Email</th>
+                        <th style="padding: 12px; background: linear-gradient(135deg, #d9b8ff, #ff6b9d); color: black;">Логин</th>
+                        <th style="padding: 12px; background: linear-gradient(135deg, #d9b8ff, #ff6b9d); color: black;">Роль</th>
+                        <th style="padding: 12px; background: linear-gradient(135deg, #d9b8ff, #ff6b9d); color: black;">Сменить роль</th>
+                    </tr>
+                </thead>
+                <tbody id="usersTableBody"></tbody>
+            </table>
+        </div>
+    `;
+    
+    const tbody = document.getElementById('usersTableBody');
+    tbody.innerHTML = users.map(u => {
+        // Смайлик для роли
+        const roleEmojis = { 1: '👑', 2: '💼', 3: '👨‍🍳', 4: '👤' };
+        const roleEmoji = roleEmojis[u.roleId] || '❓';
         
-        app.innerHTML = `
-            <div style="display: flex; gap: 1rem; margin-bottom: 1rem;">
-                <button class="btn" onclick="changePage('admin')">◀ Назад</button>
-                <button class="btn" onclick="renderUsers()">👥 Пользователи</button>
-                <button class="btn" onclick="renderStaff()">👨‍🍳 Сотрудники</button>
-            </div>
-            <h2>👥 Все пользователи</h2>
-            <div style="overflow-x: auto;">
-                <table class="users-table">
-                    <thead>
-                        <tr><th>ID</th><th>Имя</th><th>Фамилия</th><th>Email</th><th>Логин</th><th>Роль</th><th>Сменить роль</th></tr>
-                    </thead>
-                    <tbody id="usersTableBody"></tbody>
-                </table>
-            </div>
-        `;
-        
-        const tbody = document.getElementById('usersTableBody');
-        tbody.innerHTML = users.map(u => `
-            <tr>
-                <td>${u.id}</td>
-                <td>${escapeHtml(u.name)}</td>
-                <td>${escapeHtml(u.surname)}</td>
-                <td>${escapeHtml(u.email)}</td>
-                <td>${escapeHtml(u.login)}</td>
-                <td><span class="role-badge">${roleBadges[u.roleId] || 'Неизвестно'}</span></td>
-                <td>
-                    <select id="roleSelect_${u.id}" class="status-select">
+        return `
+            <tr style="border-bottom: 1px solid #d9b8ff;">
+                <td style="padding: 10px;">${u.id}</td>
+                <td style="padding: 10px;">${escapeHtml(u.name)}</td>
+                <td style="padding: 10px;">${escapeHtml(u.surname)}</td>
+                <td style="padding: 10px;">${escapeHtml(u.email)}</td>
+                <td style="padding: 10px;">${escapeHtml(u.login)}</td>
+                <td style="padding: 10px;">
+                    <span style="background: linear-gradient(135deg, #d9b8ff, #ff6b9d); color: black; padding: 5px 12px; border-radius: 20px; font-weight: bold;">
+                        ${roleEmoji} ${roleNames[u.roleId]}
+                    </span>
+                </td>
+                <td style="padding: 10px;">
+                    <select id="roleSelect_${u.id}" style="background: #1a1a1a; color: white; border: 1px solid #d9b8ff; border-radius: 20px; padding: 6px 12px; font-size: 14px;">
                         <option value="1" ${u.roleId === 1 ? 'selected' : ''}>👑 Админ</option>
                         <option value="2" ${u.roleId === 2 ? 'selected' : ''}>💼 Продавец</option>
                         <option value="3" ${u.roleId === 3 ? 'selected' : ''}>👨‍🍳 Пекарь</option>
                         <option value="4" ${u.roleId === 4 ? 'selected' : ''}>👤 Клиент</option>
                     </select>
-                    <button onclick="changeUserRole(${u.id})" class="btn" style="margin-top:0;">Изменить</button>
+                    <button onclick="changeUserRole(${u.id})" style="background: linear-gradient(135deg, #00b894, #009432); border: none; border-radius: 20px; padding: 6px 15px; margin-left: 8px; color: white; font-weight: bold; cursor: pointer;">✨ Изменить</button>
                 </td>
             </tr>
-        `).join('');
-        
-    } catch (error) {
-        console.error('Ошибка загрузки пользователей:', error);
-        showToast('Ошибка загрузки пользователей: ' + error.message, 'error');
-    }
+        `;
+    }).join('');
 }
 
-// changeUserRole - вызывает updateUserRole из api.js
 async function changeUserRole(userId) {
     const select = document.getElementById(`roleSelect_${userId}`);
-    if (!select) {
-        showToast('Ошибка: элемент не найден', 'error');
-        return;
-    }
+    if (!select) return;
     
     const roleId = parseInt(select.value);
     
-    console.log(`Меняем роль пользователя ${userId} на ${roleId}`);
-    
     try {
-        // Вызываем исправленную функцию из api.js
         await updateUserRole(userId, roleId);
-        showToast('✅ Роль пользователя изменена!', 'success');
+        showToast('✅ Роль изменена на ' + select.options[select.selectedIndex].text, 'success');
         
-        // Если изменили роль текущего пользователя, обновляем данные
         if (currentUser && currentUser.userId === userId) {
             currentUser.roleId = roleId;
             localStorage.setItem('user', JSON.stringify(currentUser));
             renderNav();
         }
-        
-        // Обновляем список пользователей
         await renderUsers();
-        
     } catch (error) {
-        console.error('Ошибка при смене роли:', error);
         showToast('❌ Ошибка: ' + error.message, 'error');
     }
 }
 
-// Глобальные функции
 window.renderUsers = renderUsers;
 window.changeUserRole = changeUserRole;
