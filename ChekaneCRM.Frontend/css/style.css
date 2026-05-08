@@ -212,3 +212,72 @@ label {
     border-color: #ff4444;
     opacity: 0.7;
 }
+/* Детальная карточка товара */
+.product-detail-card {
+    background: linear-gradient(135deg, #ffe4f0, #ffd6e8);
+    border-radius: 30px;
+    padding: 2rem;
+    margin-top: 1rem;
+    color: #4a006a;
+}
+
+.nutrition-card {
+    background: #1a1a1a;
+    border-radius: 15px;
+    padding: 0.8rem 1.2rem;
+    text-align: center;
+    min-width: 80px;
+    border: 1px solid #d9b8ff;
+}
+
+.nutrition-value {
+    font-size: 1.5rem;
+    font-weight: bold;
+    color: #d9b8ff;
+    display: block;
+}
+
+.nutrition-label {
+    font-size: 0.7rem;
+    color: #888;
+}
+
+.badge {
+    display: inline-block;
+    padding: 0.3rem 0.8rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    background: #1a1a1a;
+    margin-right: 0.5rem;
+}
+
+.badge-success {
+    background: linear-gradient(135deg, #00b894, #009432);
+    color: white;
+}
+
+.badge-danger {
+    background: linear-gradient(135deg, #ff4757, #ff6b81);
+    color: white;
+}
+
+.btn-add-to-cart {
+    background: linear-gradient(135deg, #00b894, #009432);
+    padding: 0.8rem 1.5rem;
+    font-size: 1rem;
+    margin-right: 1rem;
+}
+
+.btn-edit {
+    background: linear-gradient(135deg, #d9b8ff, #ff6b9d);
+    padding: 0.8rem 1.5rem;
+    font-size: 1rem;
+}
+
+.product-card {
+    transition: transform 0.2s;
+}
+
+.product-card:hover {
+    transform: translateY(-5px);
+}
