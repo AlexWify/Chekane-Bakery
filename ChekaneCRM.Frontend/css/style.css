@@ -187,3 +187,28 @@ label {
     transform: scale(1.02);
     box-shadow: 0 0 10px rgba(0, 184, 148, 0.6);
 }
+/* Карточки товаров с картинками */
+.product-card {
+    background: linear-gradient(135deg, #ffe4f0, #ffd6e8);
+    color: #4a006a;
+    border-radius: 20px;
+    padding: 1.2rem;
+    width: 260px;
+    border: 2px solid #d9b8ff;
+    transition: 0.3s;
+    box-shadow: 0 0 10px rgba(217,184,255,0.3);
+}
+
+.product-card img {
+    transition: transform 0.3s ease;
+}
+
+.product-card img:hover {
+    transform: scale(1.02);
+}
+
+.product-card.unavailable {
+    filter: grayscale(0.6);
+    border-color: #ff4444;
+    opacity: 0.7;
+}
