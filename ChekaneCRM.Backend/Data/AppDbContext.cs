@@ -11,7 +11,7 @@ namespace ChekaneCRM.Backend.Data
         public DbSet<Role> Roles { get; set; }
         public DbSet<User> Users { get; set; }
         public DbSet<Order> Orders { get; set; }
-        public DbSet<OrderProduct> OrderProducts { get; set; }  // 👈 ДОБАВЬ ЭТУ СТРОКУ
+        public DbSet<OrderProduct> OrderProducts { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -40,6 +40,14 @@ namespace ChekaneCRM.Backend.Data
                 .WithMany(o => o.OrderProducts)
                 .HasForeignKey(op => op.OrderId)
                 .OnDelete(DeleteBehavior.Cascade);
+
+            //  КАСКАДНОЕ УДАЛЕНИЕ ДЛЯ ПОЛЬЗОВАТЕЛЯ 
+            // При удалении пользователя, все его заказы удаляются каскадно
+            modelBuilder.Entity<Order>()
+                .HasOne(o => o.Client)
+                .WithMany()
+                .HasForeignKey(o => o.ClientId)
+                .OnDelete(DeleteBehavior.Cascade);  // Изменено с Restrict на Cascade
 
             // Роли
             modelBuilder.Entity<Role>().HasData(
