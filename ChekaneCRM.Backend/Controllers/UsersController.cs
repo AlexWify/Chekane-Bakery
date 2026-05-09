@@ -49,6 +49,7 @@ namespace ChekaneCRM.Backend.Controllers
                     Surname = u.Surname,
                     Email = u.Email,
                     Phone = u.Phone,
+                    Login = u.Login,
                     RoleId = u.RoleId,
                     RoleName = u.Role != null ? u.Role.Name : "staff"
                 })
@@ -78,6 +79,7 @@ namespace ChekaneCRM.Backend.Controllers
             user.Surname = request.Surname;
             user.Email = request.Email;
             user.Login = request.Login;
+            user.Phone = request.Phone ?? user.Phone;
             
             if (!string.IsNullOrEmpty(request.Password))
             {
@@ -88,46 +90,86 @@ namespace ChekaneCRM.Backend.Controllers
             return Ok(new { success = true, message = "Пользователь обновлён" });
         }
 
-        [HttpDelete("{id}")]
-public async Task<IActionResult> DeleteUser(int id)
-{
-    try
-    {
-        var user = await _db.Users.FindAsync(id);
-        if (user == null) 
-            return NotFound(new { message = "Пользователь не найден" });
-        
-        // Получаем все заказы пользователя
-        var orders = await _db.Orders
-            .Where(o => o.ClientId == id)
-            .ToListAsync();
-        
-        foreach (var order in orders)
+        [HttpPost("delete-account")]
+        public async Task<IActionResult> DeleteAccount([FromBody] DeleteAccountRequest request)
         {
-            // Получаем товары для каждого заказа
-            var orderProducts = await _db.OrderProducts
-                .Where(op => op.OrderId == order.Id)
+            Console.WriteLine($" УДАЛЕНИЕ АККАУНТА ");
+            Console.WriteLine($"Получен userId: {request.UserId}");
+            Console.WriteLine($"Получен пароль: '{request.Password}'");
+            
+            var user = await _db.Users.FindAsync(request.UserId);
+            if (user == null) 
+            {
+                Console.WriteLine("Пользователь не найден");
+                return NotFound(new { message = "Пользователь не найден" });
+            }
+            
+            Console.WriteLine($"Пароль в БД: '{user.Password}'");
+            Console.WriteLine($"Совпадают: {user.Password == request.Password}");
+            
+            if (user.Password != request.Password)
+            {
+                Console.WriteLine("Пароль не совпадает!");
+                return BadRequest(new { message = "Неверный пароль" });
+            }
+            
+            Console.WriteLine("Пароль верный, удаляем...");
+            
+            // Удаляем связанные заказы
+            var orders = await _db.Orders
+                .Where(o => o.ClientId == request.UserId)
                 .ToListAsync();
             
-            _db.OrderProducts.RemoveRange(orderProducts);
+            foreach (var order in orders)
+            {
+                var orderProducts = await _db.OrderProducts
+                    .Where(op => op.OrderId == order.Id)
+                    .ToListAsync();
+                _db.OrderProducts.RemoveRange(orderProducts);
+            }
+            _db.Orders.RemoveRange(orders);
+            
+            // Удаляем пользователя
+            _db.Users.Remove(user);
+            await _db.SaveChangesAsync();
+            
+            Console.WriteLine("Аккаунт удалён!");
+            return Ok(new { success = true, message = "Аккаунт удалён" });
         }
-        
-        _db.Orders.RemoveRange(orders);
-        
-        // Сохраняем изменения перед удалением пользователя
-        await _db.SaveChangesAsync();
-        
-        // Удаляем пользователя
-        _db.Users.Remove(user);
-        await _db.SaveChangesAsync();
-        
-        return Ok(new { success = true, message = "Пользователь удалён" });
-    }
-    catch (Exception ex)
-    {
-        return BadRequest(new { message = "Ошибка: " + ex.Message });
-    }
-}
+
+        [HttpDelete("{id}")]
+        public async Task<IActionResult> DeleteUser(int id)
+        {
+            try
+            {
+                var user = await _db.Users.FindAsync(id);
+                if (user == null) 
+                    return NotFound(new { message = "Пользователь не найден" });
+                
+                var orders = await _db.Orders
+                    .Where(o => o.ClientId == id)
+                    .ToListAsync();
+                
+                foreach (var order in orders)
+                {
+                    var orderProducts = await _db.OrderProducts
+                        .Where(op => op.OrderId == order.Id)
+                        .ToListAsync();
+                    _db.OrderProducts.RemoveRange(orderProducts);
+                }
+                _db.Orders.RemoveRange(orders);
+                
+                await _db.SaveChangesAsync();
+                _db.Users.Remove(user);
+                await _db.SaveChangesAsync();
+                
+                return Ok(new { success = true, message = "Пользователь удалён" });
+            }
+            catch (Exception ex)
+            {
+                return BadRequest(new { message = "Ошибка: " + ex.Message });
+            }
+        }
 
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] UserCreateRequest request)
@@ -182,6 +224,13 @@ public async Task<IActionResult> DeleteUser(int id)
         public string Surname { get; set; } = string.Empty;
         public string Email { get; set; } = string.Empty;
         public string Login { get; set; } = string.Empty;
+        public string? Phone { get; set; }
         public string? Password { get; set; }
+    }
+
+    public class DeleteAccountRequest
+    {
+        public int UserId { get; set; }
+        public string Password { get; set; } = string.Empty;
     }
 }
