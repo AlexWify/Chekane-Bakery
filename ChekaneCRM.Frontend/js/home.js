@@ -3,9 +3,32 @@ async function renderHome() {
     const app = document.getElementById('app');
     app.innerHTML = `
         <div class="hero">
-            <h1>🥐 Пекарня "Чеканэ"</h1>
-            <p style="font-size: 1.2rem;">Домашняя выпечка с любовью</p>
-            <button onclick="changePage('products')" style="margin-top: 2rem; padding: 0.8rem 2rem;">Смотреть каталог →</button>
+            <div class="hero-left">
+                <h1 class="bakery-name">Пекарня<br>ЧЕКАНЭ</h1>
+                <div class="hero-text">
+                    <p class="hero-line">Домашняя</p>
+                    <p class="hero-line neon-handwritten">выпечка</p>
+                    <p class="hero-line">с любовью</p>
+                </div>
+            </div>
+            <div class="hero-right">
+                <div class="hero-products">
+                    <div class="product-item">
+                        <img src="/images/k.png" alt="Хлеб" class="product-img flying">
+                    </div>
+                    <div class="product-item">
+                        <img src="/images/p.jpg" alt="Выпечка" class="product-img flying">
+                    </div>
+                    <div class="product-item">
+                        <img src="/images/cat.jpg" alt="Торт" class="product-img flying">
+                    </div>
+                </div>
+                <p class="hero-slogan">
+                    Вся наша продукция<br>
+                    в одном каталоге
+                </p>
+                <button onclick="changePage('products')" class="hero-btn">В каталог →</button>
+            </div>
         </div>
         <div class="feature-grid">
             <div class="feature-card"><h3>🍞 Свежая выпечка</h3><p>Каждый день с 6 утра</p></div>
