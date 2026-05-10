@@ -1,4 +1,5 @@
-// API вызовы
+const API_URL = 'http://localhost:5000/api';
+
 async function apiRequest(url, method = 'GET', body = null) {
     const options = {
         method,
@@ -7,12 +8,11 @@ async function apiRequest(url, method = 'GET', body = null) {
         }
     };
 
-    // если body не null, преобразуем в JSON
     if (body !== null && body !== undefined) {
         options.body = JSON.stringify(body);
     }
 
-    console.log(`API Request: ${method} ${url}`, body); // Для отладки
+    console.log(`API Request: ${method} ${url}`, body);
 
     try {
         const response = await fetch(`${API_URL}${url}`, options);
@@ -38,20 +38,30 @@ async function loginByPhone(phone, password) {
     return await apiRequest('/auth/login-by-phone', 'POST', { phone, password });
 }
 
-// Товары
+async function registerUser(userData) {
+    return await apiRequest('/auth/register', 'POST', userData);
+}
+
 async function loadProducts() {
     return await apiRequest('/products');
+}
+
+async function createProduct(productData) {
+    return await apiRequest('/products', 'POST', productData);
+}
+
+async function updateProduct(productId, productData) {
+    return await apiRequest(`/products/${productId}`, 'PUT', productData);
 }
 
 async function toggleProductAvailability(id) {
     return await apiRequest(`/products/${id}/toggle`, 'PATCH', {});
 }
 
-// Заказы
 async function loadOrders() {
-    if (!currentUser) return [];
-    const isAdmin = currentUser.roleId === 1;
-    const url = isAdmin ? '/orders' : `/orders/client/${currentUser.userId}`;
+    if (!window.currentUser) return [];
+    const isAdmin = window.currentUser.roleId === 1;
+    const url = isAdmin ? '/orders' : `/orders/client/${window.currentUser.userId}`;
     return await apiRequest(url);
 }
 
@@ -63,7 +73,6 @@ async function updateOrderStatus(orderId, status) {
     return await apiRequest(`/orders/${orderId}/status`, 'PATCH', { status });
 }
 
-// Пользователи
 async function loadUsers() {
     return await apiRequest('/users');
 }
@@ -73,24 +82,9 @@ async function loadStaff() {
 }
 
 async function updateUserRole(userId, roleId) {
-    console.log(`Отправляем смену роли: userId=${userId}, roleId=${roleId}`);
     return await apiRequest(`/users/${userId}/role`, 'PATCH', roleId);
 }
 
-// Авторизация
 async function loginUser(login, password) {
     return await apiRequest('/auth/login', 'POST', { login, password });
-}
-
-async function registerUser(userData) {
-    return await apiRequest('/auth/register', 'POST', userData);
-}
-// Добавление товара (только админ)
-async function createProduct(productData) {
-    return await apiRequest('/products', 'POST', productData);
-}
-
-// Обновление товара (только админ)
-async function updateProduct(productId, productData) {
-    return await apiRequest(`/products/${productId}`, 'PUT', productData);
 }
