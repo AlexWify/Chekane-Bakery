@@ -66,7 +66,7 @@ namespace ChekaneCRM.Backend.Controllers
                 Email = request.Email,
                 Login = request.Login ?? request.Phone,
                 Password = request.Password,
-                RoleId = 4  /
+                RoleId = 4  
             };
 
             _db.Users.Add(user);
