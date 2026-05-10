@@ -1,4 +1,4 @@
-// auth-pages.js - вход по телефону
+//вход по телефону
 function showLoginPage() {
     currentPage = 'login';
     renderNav();
@@ -15,32 +15,40 @@ function showLoginPage() {
     
     const loginBtn = document.getElementById('loginButton');
     if (loginBtn) {
-        loginBtn.onclick = () => {
+        loginBtn.onclick = async () => {
             let phone = document.getElementById('phoneInput').value.trim();
             const password = document.getElementById('passwordInput').value;
             const errorsDiv = document.getElementById('loginErrors');
             errorsDiv.innerHTML = '';
-            
+
             // Очищаем телефон от нецифр
             const phoneClean = phone.replace(/\D/g, '');
-            
+
             if (phoneClean.length === 0) {
                 errorsDiv.innerHTML = '❌ Введите номер телефона';
                 return;
             }
-            
+
             if (phoneClean.length !== 11) {
                 errorsDiv.innerHTML = '❌ Номер телефона должен содержать 11 цифр';
                 return;
             }
-            
+
             if (!password) {
                 errorsDiv.innerHTML = '❌ Введите пароль';
                 return;
             }
-            
-            // вызываем loginByPhone, а не login
-            loginByPhone(phoneClean, password);
+
+            try {
+                const user = await loginByPhone(phoneClean, password);
+                currentUser = user;
+                localStorage.setItem('user', JSON.stringify(user));
+                renderNav();
+                showToast(`✅ Добро пожаловать, ${user.name}!`, 'success');
+                changePage('home');
+            } catch (error) {
+                errorsDiv.innerHTML = '❌ ' + error.message;
+            }
         };
     }
 }
@@ -78,6 +86,7 @@ function validatePhone(phone) {
     }
     return { valid: true, message: '' };
 }
+
 
 function validateEmail(email) {
     const emailLower = email.toLowerCase();
