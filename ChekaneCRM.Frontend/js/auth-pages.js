@@ -21,7 +21,6 @@ function showLoginPage() {
             const errorsDiv = document.getElementById('loginErrors');
             errorsDiv.innerHTML = '';
 
-            // Очищаем телефон от нецифр
             const phoneClean = phone.replace(/\D/g, '');
 
             if (phoneClean.length === 0) {
@@ -40,13 +39,34 @@ function showLoginPage() {
             }
 
             try {
-                const user = await loginByPhone(phoneClean, password);
-                currentUser = user;
-                localStorage.setItem('user', JSON.stringify(user));
+                const userData = await loginByPhone(phoneClean, password);
+                console.log('Данные пользователя:', userData);
+                
+                // Формируем объект пользователя (универсальный формат)
+                currentUser = {
+                    userId: userData.userId || userData.id,
+                    id: userData.userId || userData.id,
+                    name: userData.name,
+                    phone: userData.phone || phoneClean,
+                    roleId: userData.roleId || userData.role || 4
+                };
+                
+                localStorage.setItem('user', JSON.stringify(currentUser));
                 renderNav();
-                showToast(`✅ Добро пожаловать, ${user.name}!`, 'success');
-                changePage('home');
+                showToast(`✅ Добро пожаловать, ${currentUser.name}!`, 'success');
+                
+                // Переход на страницу товаров
+                setTimeout(() => {
+                    if (typeof changePage === 'function') {
+                        changePage('products');
+                    } else {
+                        console.error('changePage не найдена');
+                        window.location.href = '#products';
+                    }
+                }, 100);
+                
             } catch (error) {
+                console.error('Ошибка входа:', error);
                 errorsDiv.innerHTML = '❌ ' + error.message;
             }
         };
@@ -86,7 +106,6 @@ function validatePhone(phone) {
     }
     return { valid: true, message: '' };
 }
-
 
 function validateEmail(email) {
     const emailLower = email.toLowerCase();
