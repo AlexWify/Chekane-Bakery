@@ -16,7 +16,6 @@ async function apiRequest(url, method = 'GET', body = null) {
     return await response.json();
 }
 
-// Auth
 async function loginByPhone(phone, password) {
     return await apiRequest('/auth/login-by-phone', 'POST', { phone, password });
 }
@@ -25,7 +24,6 @@ async function registerUser(userData) {
     return await apiRequest('/auth/register', 'POST', userData);
 }
 
-// Products
 async function loadProducts() {
     return await apiRequest('/products');
 }
@@ -42,12 +40,25 @@ async function toggleProductAvailability(id) {
     return await apiRequest(`/products/${id}/toggle`, 'PATCH', {});
 }
 
-// Orders
+// работающ loadOrders - используем глобальный currentUser
 async function loadOrders() {
-    if (!window.currentUser) return [];
-    const isAdmin = window.currentUser.roleId === 1;
-    const url = isAdmin ? '/orders' : `/orders/client/${window.currentUser.userId}`;
-    return await apiRequest(url);
+    console.log('loadOrders вызвана');
+    console.log('currentUser:', currentUser);
+    
+    if (!currentUser) {
+        console.log('Нет пользователя');
+        return [];
+    }
+    
+    // Админ (roleId === 1) видит все заказы
+    if (currentUser.roleId === 1) {
+        console.log('Админ - загружаем все заказы');
+        return await apiRequest('/orders');
+    }
+    
+    // Обычный пользователь - только свои
+    console.log('Обычный пользователь - загружаем свои заказы');
+    return await apiRequest(`/orders/client/${currentUser.userId}`);
 }
 
 async function createOrder(orderData) {
@@ -55,10 +66,9 @@ async function createOrder(orderData) {
 }
 
 async function updateOrderStatus(orderId, status) {
-    return await apiRequest(`/orders/${orderId}/status`, 'PATCH', { status });
+    return await apiRequest(`/orders/${orderId}/status`, 'PATCH', status);
 }
 
-// Users
 async function loadUsers() {
     return await apiRequest('/users');
 }
@@ -75,6 +85,7 @@ async function loginUser(login, password) {
     return await apiRequest('/auth/login', 'POST', { login, password });
 }
 
+// Экспорт в глобальную область
 if (typeof window !== 'undefined') {
     window.apiRequest = apiRequest;
     window.loginByPhone = loginByPhone;
