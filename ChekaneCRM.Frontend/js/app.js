@@ -9,6 +9,7 @@ const savedCart = localStorage.getItem('cart');
 if (savedCart) {
     try { cart = JSON.parse(savedCart); } catch(e) {}
 }
+//changePage('products')
 
 // Глобальные функции для HTML
 window.changePage = changePage;
