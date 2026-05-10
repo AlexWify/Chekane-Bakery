@@ -2,24 +2,21 @@
 async function apiRequest(url, method = 'GET', body = null) {
     const options = {
         method,
-        headers: { 
+        headers: {
             'Content-Type': 'application/json'
         }
     };
-async function loginByPhone(phone, password) {
-    return await apiRequest('/auth/login-by-phone', 'POST', { phone, password });
-}
-    
+
     // если body не null, преобразуем в JSON
     if (body !== null && body !== undefined) {
         options.body = JSON.stringify(body);
     }
-    
+
     console.log(`API Request: ${method} ${url}`, body); // Для отладки
-    
+
     try {
         const response = await fetch(`${API_URL}${url}`, options);
-        
+
         if (!response.ok) {
             let errorMessage = `Ошибка ${response.status}`;
             try {
@@ -29,12 +26,16 @@ async function loginByPhone(phone, password) {
             } catch(e) {}
             throw new Error(errorMessage);
         }
-        
+
         return await response.json();
     } catch (error) {
         console.error('API Error:', error);
         throw error;
     }
+}
+
+async function loginByPhone(phone, password) {
+    return await apiRequest('/auth/login-by-phone', 'POST', { phone, password });
 }
 
 // Товары
@@ -43,7 +44,6 @@ async function loadProducts() {
 }
 
 async function toggleProductAvailability(id) {
-    //  toggle отправляем пустой объект или ничего
     return await apiRequest(`/products/${id}/toggle`, 'PATCH', {});
 }
 
@@ -93,13 +93,4 @@ async function createProduct(productData) {
 // Обновление товара (только админ)
 async function updateProduct(productId, productData) {
     return await apiRequest(`/products/${productId}`, 'PUT', productData);
-}
-
-// Удаление товара (только админ)
-async function deleteProduct(productId) {
-    return await apiRequest(`/products/${productId}`, 'DELETE');
-}
-// Удаление заказа (только админ)
-async function deleteOrder(orderId) {
-    return await apiRequest(`/orders/${orderId}`, 'DELETE');
 }
