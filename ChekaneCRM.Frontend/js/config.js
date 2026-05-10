@@ -1,5 +1,5 @@
 // Конфигурация
-const API_URL = 'http://localhost:5000/api';
+//const API_URL = 'http://localhost:5000/api';
 let currentUser = null;
 let cart = JSON.parse(localStorage.getItem('cart') || '[]');
 let currentPage = 'home';
