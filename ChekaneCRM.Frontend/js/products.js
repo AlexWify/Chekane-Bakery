@@ -7,8 +7,8 @@ function getProductImage(category) {
     const categoryLower = (category || '').toLowerCase();
     if (categoryLower.includes('хлеб') || categoryLower.includes('bread')) return '/images/bread.jpg';
     if (categoryLower.includes('торт') || categoryLower.includes('cake')) return '/images/cake.jpg';
-    if (categoryLower.includes('выпечк') || categoryLower.includes('pastry') || categoryLower.includes('булочк')) return '/images/pastry.jpg';
-    if (categoryLower.includes('печенье') || categoryLower.includes('cookie')) return '/images/cookies.jpg';
+    if (categoryLower.includes('выпечка') || categoryLower.includes('pastry') || categoryLower.includes('булочки')) return '/images/pastry.jpg';
+    if (categoryLower.includes('печенье') || categoryLower.includes('cookie')) return '/images/gir.png';
     return '/images/default.jpg';
 }
 
@@ -25,6 +25,7 @@ async function renderProducts(searchTerm = '') {
             (p.description && p.description.toLowerCase().includes(term))
         );
     }
+    
     
     const app = document.getElementById('app');
     const canManage = currentUser && (currentUser.roleId === 1 || currentUser.roleId === 3);
@@ -72,10 +73,10 @@ async function renderProducts(searchTerm = '') {
                         </div>
                     ` : ''}
                 </div>
-                <h3 style="cursor: pointer;" onclick="openProductDetails(${p.id})">${escapeHtml(p.name)}</h3>
+                <h3 style="cursor: pointer; color: #d9b8ff;" onclick="openProductDetails(${p.id})">${escapeHtml(p.name)}</h3>
                 <div class="price">${p.price} ₽</div>
-                <div>📁 ${escapeHtml(p.category || 'Без категории')}</div>
-                <div>${p.isAvailable ? '✅ В наличии' : '❌ Нет в наличии'}</div>
+                <div style="color: #d9b8ff;">📁 ${escapeHtml(p.category || 'Без категории')}</div>
+                <div style="color: #d9b8ff;">${p.isAvailable ? '✅ В наличии' : '❌ Нет в наличии'}</div>
                 <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.5rem;">
                     <button onclick="openProductDetails(${p.id})">🔍 Подробнее</button>
                     ${p.isAvailable ? `<button onclick="addToCart({id:${p.id}, name:'${escapeHtml(p.name)}', price:${p.price}})">🛒 В корзину</button>` : ''}
@@ -176,7 +177,7 @@ async function openProductDetails(productId) {
                     <h1 style="font-size: 2rem;">${escapeHtml(product.name)}</h1>
                     <div class="price" style="font-size: 2rem;">${product.price} ₽</div>
                     <div style="margin: 1rem 0;">
-                        <span class="badge">📁 ${escapeHtml(product.category || 'Без категории')}</span>
+                        <span class="badge" style="color: #d9b8ff;">📁 ${escapeHtml(product.category || 'Без категории')}</span>
                         <span class="badge ${product.isAvailable ? 'badge-success' : 'badge-danger'}">${product.isAvailable ? '✅ В наличии' : '❌ Нет в наличии'}</span>
                     </div>
                     <div style="margin: 1rem 0;">
@@ -184,12 +185,12 @@ async function openProductDetails(productId) {
                         <p>${escapeHtml(product.description || 'Описание отсутствует')}</p>
                     </div>
                     <div style="margin: 1rem 0;">
-                        <h3>🥗 Пищевая ценность (на 100г)</h3>
+                        <h3 style="color: #d9b8ff;">🥗 Пищевая ценность (на 100г)</h3>
                         <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
-                            <div style="background: #1a1a1a; border-radius: 15px; padding: 0.8rem 1.2rem; text-align: center;"><span style="font-size: 1.5rem; font-weight: bold; color: #d9b8ff;">${product.proteins || 0}</span><br><span style="font-size: 0.7rem;">Белки (г)</span></div>
-                            <div style="background: #1a1a1a; border-radius: 15px; padding: 0.8rem 1.2rem; text-align: center;"><span style="font-size: 1.5rem; font-weight: bold; color: #d9b8ff;">${product.fats || 0}</span><br><span style="font-size: 0.7rem;">Жиры (г)</span></div>
-                            <div style="background: #1a1a1a; border-radius: 15px; padding: 0.8rem 1.2rem; text-align: center;"><span style="font-size: 1.5rem; font-weight: bold; color: #d9b8ff;">${product.carbohydrates || 0}</span><br><span style="font-size: 0.7rem;">Углеводы (г)</span></div>
-                            <div style="background: #1a1a1a; border-radius: 15px; padding: 0.8rem 1.2rem; text-align: center;"><span style="font-size: 1.5rem; font-weight: bold; color: #d9b8ff;">${product.calories || 0}</span><br><span style="font-size: 0.7rem;">Ккал</span></div>
+                            <div style="background: #1a1a1a; border-radius: 15px; padding: 0.8rem 1.2rem; text-align: center;"><span style="font-size: 1.5rem; font-weight: bold; color: #d9b8ff;">${product.proteins || 0}</span><br><span style="font-size: 0.7rem; color: #d9b8ff;">Белки (г)</span></div>
+                            <div style="background: #1a1a1a; border-radius: 15px; padding: 0.8rem 1.2rem; text-align: center;"><span style="font-size: 1.5rem; font-weight: bold; color: #d9b8ff;">${product.fats || 0}</span><br><span style="font-size: 0.7rem; color: #d9b8ff;">Жиры (г)</span></div>
+                            <div style="background: #1a1a1a; border-radius: 15px; padding: 0.8rem 1.2rem; text-align: center;"><span style="font-size: 1.5rem; font-weight: bold; color: #d9b8ff;">${product.carbohydrates || 0}</span><br><span style="font-size: 0.7rem; color: #d9b8ff;">Углеводы (г)</span></div>
+                            <div style="background: #1a1a1a; border-radius: 15px; padding: 0.8rem 1.2rem; text-align: center;"><span style="font-size: 1.5rem; font-weight: bold; color: #d9b8ff;">${product.calories || 0}</span><br><span style="font-size: 0.7rem; color: #d9b8ff;">Ккал</span></div>
                         </div>
                     </div>
                     <div style="margin: 1rem 0;">
