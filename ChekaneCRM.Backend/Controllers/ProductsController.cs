@@ -55,27 +55,25 @@ namespace ChekaneCRM.Backend.Controllers
         }
 
         [HttpPut("{id}")]
-        public async Task<IActionResult> Update(int id, [FromBody] Product updated)
-        {
-            var product = await _db.Products.FindAsync(id);
-            if (product == null) return NotFound(new { error = "Товар не найден" });
+public async Task<IActionResult> Update(int id, [FromBody] Product updated)
+{
+    var product = await _db.Products.FindAsync(id);
+    if (product == null) return NotFound(new { error = "Товар не найден" });
 
-            // Основные поля
-            product.Name = updated.Name;
-            product.Description = updated.Description;
-            product.Price = updated.Price;
-            product.Category = updated.Category;
-            
-            // БЖУ и состав 
-            product.Proteins = updated.Proteins;
-            product.Fats = updated.Fats;
-            product.Carbohydrates = updated.Carbohydrates;
-            product.Calories = updated.Calories;
-            product.Ingredients = updated.Ingredients;
-            
-            await _db.SaveChangesAsync();
-            return Ok(product);
-        }
+    product.Name = updated.Name;
+    product.Description = updated.Description;
+    product.Price = updated.Price;
+    product.Category = updated.Category;
+    product.IsAvailable = updated.IsAvailable; 
+    product.Proteins = updated.Proteins;
+    product.Fats = updated.Fats;
+    product.Carbohydrates = updated.Carbohydrates;
+    product.Calories = updated.Calories;
+    product.Ingredients = updated.Ingredients;
+    
+    await _db.SaveChangesAsync();
+    return Ok(product);
+}
 
         [HttpDelete("{id}")]
         public async Task<IActionResult> Delete(int id)
