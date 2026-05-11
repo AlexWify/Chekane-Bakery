@@ -2,6 +2,7 @@ console.log('products.js загружен');
 
 let editingProductId = null;
 let allProducts = [];
+let currentCategoryFilter = 'all'; // Добавляем переменную для текущей категории
 
 function getProductImage(category) {
     const categoryLower = (category || '').toLowerCase();
@@ -12,20 +13,52 @@ function getProductImage(category) {
     return '/images/default.jpg';
 }
 
-async function renderProducts(searchTerm = '') {
-    const products = await loadProducts();
-    allProducts = products;
+// Функция для получения уникальных категорий из товаров
+function getUniqueCategories(products) {
+    const categories = new Set();
+    products.forEach(product => {
+        if (product.category && product.category.trim() !== '') {
+            categories.add(product.category);
+        }
+    });
+    return Array.from(categories).sort();
+}
+
+// Функция для фильтрации товаров по категории и поиску
+function filterProducts(products, searchTerm, category) {
+    let filtered = products;
     
-    let filteredProducts = products;
+    // Фильтр по поиску
     if (searchTerm && searchTerm.trim() !== '') {
         const term = searchTerm.toLowerCase().trim();
-        filteredProducts = products.filter(p => 
+        filtered = filtered.filter(p => 
             p.name.toLowerCase().includes(term) ||
             (p.category && p.category.toLowerCase().includes(term)) ||
             (p.description && p.description.toLowerCase().includes(term))
         );
     }
     
+    // Фильтр по категории
+    if (category && category !== 'all') {
+        filtered = filtered.filter(p => p.category === category);
+    }
+    
+    return filtered;
+}
+
+async function renderProducts(searchTerm = '', category = null) {
+    const products = await loadProducts();
+    allProducts = products;
+    
+    // Если передана новая категория, обновляем currentCategoryFilter
+    if (category !== null) {
+        currentCategoryFilter = category;
+    }
+    
+    // Получаем уникальные категории для кнопок фильтра
+    const categories = getUniqueCategories(products);
+    
+    let filteredProducts = filterProducts(products, searchTerm, currentCategoryFilter);
     
     const app = document.getElementById('app');
     const canManage = currentUser && (currentUser.roleId === 1 || currentUser.roleId === 3);
@@ -36,13 +69,33 @@ async function renderProducts(searchTerm = '') {
             ${canManage ? `<button onclick="showAddProductForm()" style="background: linear-gradient(135deg, #00b894, #009432);">➕ Добавить товар</button>` : ''}
         </div>
         
-        <div style="margin-bottom: 2rem; position: relative;">
+        <!-- Поиск -->
+        <div style="margin-bottom: 1.5rem; position: relative;">
             <div style="display: flex; gap: 0.5rem;">
                 <input type="text" id="searchInput" placeholder="🔍 Поиск товаров..." style="flex: 1; padding: 0.8rem; background: #1a1a1a; border: 2px solid #d9b8ff; border-radius: 30px; color: white;">
                 <button onclick="searchProducts()" style="background: linear-gradient(135deg, #d9b8ff, #ff6b9d); padding: 0.8rem 1.5rem; border-radius: 30px;">🔍 Найти</button>
                 <button onclick="clearSearch()" style="background: #666; padding: 0.8rem 1.5rem; border-radius: 30px;">❌ Очистить</button>
             </div>
             <div id="searchSuggestions" style="position: absolute; top: 100%; left: 0; right: 0; background: #1a1a1a; border: 1px solid #d9b8ff; border-radius: 15px; max-height: 300px; overflow-y: auto; z-index: 1000; display: none;"></div>
+        </div>
+        
+        <!-- Фильтр по категориям -->
+        <div style="margin-bottom: 1.5rem;">
+            <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center;">
+                <span style="color: #d9b8ff; font-weight: bold;">📁 Фильтр по категориям:</span>
+                <button onclick="filterByCategory('all')" 
+                        style="background: ${currentCategoryFilter === 'all' ? 'linear-gradient(135deg, #d9b8ff, #ff6b9d)' : '#1a1a1a'}; 
+                               border: 1px solid #d9b8ff; padding: 0.4rem 1rem; border-radius: 20px; cursor: pointer; color: ${currentCategoryFilter === 'all' ? '#000' : '#d9b8ff'};">
+                    Все
+                </button>
+                ${categories.map(cat => `
+                    <button onclick="filterByCategory('${escapeHtml(cat)}')" 
+                            style="background: ${currentCategoryFilter === cat ? 'linear-gradient(135deg, #d9b8ff, #ff6b9d)' : '#1a1a1a'}; 
+                                   border: 1px solid #d9b8ff; padding: 0.4rem 1rem; border-radius: 20px; cursor: pointer; color: ${currentCategoryFilter === cat ? '#000' : '#d9b8ff'};">
+                        ${escapeHtml(cat)}
+                    </button>
+                `).join('')}
+            </div>
         </div>
         
         <div id="searchResultInfo" style="margin-bottom: 1rem; color: #888;"></div>
@@ -58,7 +111,8 @@ async function renderProducts(searchTerm = '') {
         return;
     }
     
-    resultInfo.innerHTML = `Найдено: ${filteredProducts.length} товаров${searchTerm ? ` по запросу "${searchTerm}"` : ''}`;
+    const filterText = currentCategoryFilter !== 'all' ? ` в категории "${currentCategoryFilter}"` : '';
+    resultInfo.innerHTML = `Найдено: ${filteredProducts.length} товаров${searchTerm ? ` по запросу "${searchTerm}"` : ''}${filterText}`;
     
     grid.innerHTML = filteredProducts.map(p => {
         const imagePath = getProductImage(p.category);
@@ -95,15 +149,25 @@ async function renderProducts(searchTerm = '') {
     }
 }
 
-function searchProducts() {
+// Функция фильтрации по категории
+function filterByCategory(category) {
+    currentCategoryFilter = category;
     const searchInput = document.getElementById('searchInput');
-    renderProducts(searchInput ? searchInput.value : '');
+    const searchTerm = searchInput ? searchInput.value : '';
+    renderProducts(searchTerm, category);
 }
 
+// Функция поиска с сохранением фильтра категории
+function searchProducts() {
+    const searchInput = document.getElementById('searchInput');
+    renderProducts(searchInput ? searchInput.value : '', currentCategoryFilter);
+}
+
+// Функция очистки поиска (фильтр категории сохраняется)
 function clearSearch() {
     const searchInput = document.getElementById('searchInput');
     if (searchInput) searchInput.value = '';
-    renderProducts('');
+    renderProducts('', currentCategoryFilter);
 }
 
 function showSuggestions() {
@@ -381,3 +445,4 @@ window.renderProducts = renderProducts;
 window.searchProducts = searchProducts;
 window.clearSearch = clearSearch;
 window.selectSuggestion = selectSuggestion;
+window.filterByCategory = filterByCategory;
