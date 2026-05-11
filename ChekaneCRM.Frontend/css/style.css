@@ -461,7 +461,6 @@ body {
     overflow-x: hidden;
 }
 
-/* Контейнер для неонового фона */
 .neon-bg {
     position: fixed;
     top: 0;
@@ -473,12 +472,10 @@ body {
     overflow: hidden;
 }
 
-/* Неоновые линии */
 .neon-line {
     position: absolute;
     background: linear-gradient(90deg, transparent, rgba(217, 184, 255, 0.3), rgba(255, 107, 157, 0.3), transparent);
     height: 2px;
-    width: 100%;
     filter: blur(3px);
     animation: slideLine 8s linear infinite;
 }
@@ -487,49 +484,27 @@ body {
     position: absolute;
     background: linear-gradient(180deg, transparent, rgba(217, 184, 255, 0.25), rgba(255, 107, 157, 0.25), transparent);
     width: 2px;
-    height: 100%;
     filter: blur(3px);
     animation: slideVertical 10s linear infinite;
 }
 
-/* Анимация горизонтальных линий */
 @keyframes slideLine {
-    0% {
-        transform: translateX(-100%);
-        opacity: 0;
-    }
-    50% {
-        opacity: 0.6;
-    }
-    100% {
-        transform: translateX(100%);
-        opacity: 0;
-    }
+    0% { transform: translateX(-100%); opacity: 0; }
+    50% { opacity: 0.6; }
+    100% { transform: translateX(100%); opacity: 0; }
 }
 
-/* Анимация вертикальных линий */
 @keyframes slideVertical {
-    0% {
-        transform: translateY(-100%);
-        opacity: 0;
-    }
-    50% {
-        opacity: 0.4;
-    }
-    100% {
-        transform: translateY(100%);
-        opacity: 0;
-    }
+    0% { transform: translateY(-100%); opacity: 0; }
+    50% { opacity: 0.4; }
+    100% { transform: translateY(100%); opacity: 0; }
 }
 
-/* Неоновые сердечки */
 .neon-heart {
     position: absolute;
     color: rgba(217, 184, 255, 0.25);
-    font-size: 20px;
     animation: floatHeart 12s ease-in-out infinite;
     filter: blur(2px);
-    text-shadow: 0 0 5px rgba(217, 184, 255, 0.5);
 }
 
 .neon-heart::before {
@@ -537,23 +512,12 @@ body {
 }
 
 @keyframes floatHeart {
-    0% {
-        transform: translateY(100vh) translateX(0) rotate(0deg);
-        opacity: 0;
-    }
-    10% {
-        opacity: 0.3;
-    }
-    90% {
-        opacity: 0.3;
-    }
-    100% {
-        transform: translateY(-100px) translateX(50px) rotate(360deg);
-        opacity: 0;
-    }
+    0% { transform: translateY(100vh) translateX(0) rotate(0deg); opacity: 0; }
+    10% { opacity: 0.3; }
+    90% { opacity: 0.3; }
+    100% { transform: translateY(-100px) translateX(50px) rotate(360deg); opacity: 0; }
 }
 
-/* Маленькие точки (звездочки) */
 .neon-dot {
     position: absolute;
     width: 3px;
@@ -565,25 +529,19 @@ body {
 }
 
 @keyframes twinkle {
-    0%, 100% {
-        opacity: 0;
-        transform: scale(1);
-    }
-    50% {
-        opacity: 0.6;
-        transform: scale(1.5);
-    }
+    0%, 100% { opacity: 0; transform: scale(1); }
+    50% { opacity: 0.6; transform: scale(1.5); }
 }
 
-/* Контент поверх фона */
+/* Контент поверх фона - БЕЗ ЧЕРНОГО КВАДРАТА */
 .navbar, .container, .auth-page, .hero, .feature-grid {
     position: relative;
     z-index: 1;
 }
 
-/* Затемнение для лучшей читаемости текста */
+/* Убираем черный фон у карточек и контейнеров */
 .container, .auth-page, .order-card, .product-card {
-    background: rgba(10, 10, 10, 0.85);
-    backdrop-filter: blur(2px);
-    border-radius: 20px;
+    background: transparent;
+    backdrop-filter: none;
+    border-radius: 0;
 }
