@@ -47,9 +47,15 @@
 - [.NET 10.0 SDK](https://dotnet.microsoft.com/download) или новее
 - Любая ОС (Windows, macOS, Linux)
 
-### Шаг 2: Запуск бэкенда
-```bash
+  # Шаг 1: Клонирование
+  ```bash
+  git clone https://github.com/AlexWify/Chekane-Bakery.git
+  cd Chekane-Bakery
+
+ # Шаг 2: Запуск бэкенда
+  ```bash
 cd ChekaneCRM.Backend
 dotnet restore
+dotnet tool install --global dotnet-ef --version 10.0.7
 dotnet ef database update
 dotnet run
