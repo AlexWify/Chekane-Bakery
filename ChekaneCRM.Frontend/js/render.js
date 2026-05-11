@@ -33,6 +33,7 @@ function renderNav() {
     }
 }
 
+
 async function changePage(page) {
     currentPage = page;
     renderNav();
@@ -46,6 +47,16 @@ async function changePage(page) {
         case 'products': 
             await renderProducts(); 
             break;
+            case 'products': 
+            await renderProducts();
+           // Добавляем черный фон 
+          const productsDiv = document.querySelector('.products-page');
+         if (productsDiv) {
+        productsDiv.style.background = '#0a0a0f';
+        productsDiv.style.borderRadius = '20px';
+        productsDiv.style.padding = '1.5rem';
+    }
+    break;
         case 'cart': 
             await renderCart(); 
             break;
