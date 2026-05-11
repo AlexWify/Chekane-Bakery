@@ -1,4 +1,4 @@
-//вход по телефону
+// вход по телефону
 function showLoginPage() {
     currentPage = 'login';
     renderNav();
@@ -39,17 +39,35 @@ function showLoginPage() {
             }
 
             try {
-                const userData = await loginByPhone(phoneClean, password);
-                console.log('Данные пользователя:', userData);
+                // ПРЯМОЙ ЗАПРОС, без посредников
+                const response = await fetch('http://localhost:5000/api/auth/login-by-phone', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ phone: phoneClean, password: password })
+                });
                 
-                // Формируем объект пользователя (универсальный формат)
+                if (!response.ok) {
+                    const error = await response.json();
+                    throw new Error(error.message || 'Ошибка входа');
+                }
+                
+                const userData = await response.json();
+                console.log('Данные пользователя от сервера:', userData);
+                
+                // Сохраняем пользователя
                 currentUser = {
-                    userId: userData.userId || userData.id,
-                    id: userData.userId || userData.id,
+                    userId: userData.userId,
+                    id: userData.userId,
                     name: userData.name,
+                    surname: userData.surname || '',
+                    email: userData.email || '',
                     phone: userData.phone || phoneClean,
-                    roleId: userData.roleId || userData.role || 4
+                    login: userData.login || '',
+                    roleId: userData.roleId
                 };
+                
+                console.log('currentUser сохранён:', currentUser);
+                console.log('currentUser.userId:', currentUser.userId);
                 
                 localStorage.setItem('user', JSON.stringify(currentUser));
                 renderNav();
@@ -60,8 +78,7 @@ function showLoginPage() {
                     if (typeof changePage === 'function') {
                         changePage('products');
                     } else {
-                        console.error('changePage не найдена');
-                        window.location.href = '#products';
+                        window.location.reload();
                     }
                 }, 100);
                 
@@ -79,14 +96,14 @@ function showRegisterPage() {
     document.getElementById('app').innerHTML = `
         <div class="auth-page">
             <h2>📝 Регистрация</h2>
-            <input type="text" id="nameInput" placeholder="Имя">
-            <input type="text" id="surnameInput" placeholder="Фамилия">
-            <input type="tel" id="phoneInput" placeholder="Телефон (11 цифр, например: 79123456789)">
-            <input type="email" id="emailInput" placeholder="Email (должен содержать @gmail)">
-            <input type="password" id="passwordInput" placeholder="Пароль (8+ символов, заглавные и строчные)">
-            <input type="password" id="passwordConfirmInput" placeholder="Подтверждение пароля">
+            <input type="text" id="nameInput" placeholder="Имя" style="width:100%; padding:0.8rem; margin-bottom:1rem; background:#1a1a1a; border:1px solid #d9b8ff; border-radius:12px; color:white;">
+            <input type="text" id="surnameInput" placeholder="Фамилия" style="width:100%; padding:0.8rem; margin-bottom:1rem; background:#1a1a1a; border:1px solid #d9b8ff; border-radius:12px; color:white;">
+            <input type="tel" id="phoneInput" placeholder="Телефон (11 цифр, например: 79123456789)" style="width:100%; padding:0.8rem; margin-bottom:1rem; background:#1a1a1a; border:1px solid #d9b8ff; border-radius:12px; color:white;">
+            <input type="email" id="emailInput" placeholder="Email (должен содержать @gmail)" style="width:100%; padding:0.8rem; margin-bottom:1rem; background:#1a1a1a; border:1px solid #d9b8ff; border-radius:12px; color:white;">
+            <input type="password" id="passwordInput" placeholder="Пароль (8+ символов, заглавные и строчные)" style="width:100%; padding:0.8rem; margin-bottom:1rem; background:#1a1a1a; border:1px solid #d9b8ff; border-radius:12px; color:white;">
+            <input type="password" id="passwordConfirmInput" placeholder="Подтверждение пароля" style="width:100%; padding:0.8rem; margin-bottom:1rem; background:#1a1a1a; border:1px solid #d9b8ff; border-radius:12px; color:white;">
             <div id="validationErrors" style="color: #ff8888; font-size: 0.8rem; margin: 0.5rem 0;"></div>
-            <button id="registerButton">Зарегистрироваться</button>
+            <button id="registerButton" style="width:100%; padding:0.8rem; background: linear-gradient(135deg, #d9b8ff, #ff6b9d); border:none; border-radius:30px; font-weight:bold; cursor:pointer;">Зарегистрироваться</button>
             <p style="text-align:center; margin-top:1rem;">Уже есть аккаунт? <a onclick="showLoginPage()" style="color:#d9b8ff; cursor:pointer;">Войти</a></p>
         </div>
     `;
@@ -182,7 +199,17 @@ async function validateAndRegister() {
     };
     
     try {
-        await registerUser(userData);
+        const response = await fetch('http://localhost:5000/api/auth/register', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(userData)
+        });
+        
+        if (!response.ok) {
+            const error = await response.json();
+            throw new Error(error.message || 'Ошибка регистрации');
+        }
+        
         showToast('✅ Регистрация успешна! Теперь войдите.', 'success');
         showLoginPage();
     } catch (error) {
