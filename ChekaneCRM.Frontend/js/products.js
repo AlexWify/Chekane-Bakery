@@ -403,8 +403,10 @@ async function updateProduct(productId) {
         carbohydrates: parseFloat(document.getElementById('productCarbohydrates').value) || 0,
         calories: parseInt(document.getElementById('productCalories').value) || 0,
         ingredients: document.getElementById('productIngredients').value,
-        isAvailable: document.getElementById('productIsAvailable').checked
+        isAvailable: document.getElementById('productIsAvailable').checked  //  ЭТО ДОЛЖНО РАБОТАТЬ!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! через боль, неважно как 
     };
+    
+    console.log('Отправка isAvailable:', productData.isAvailable);
     
     try {
         await apiRequest(`/products/${productId}`, 'PUT', productData);
