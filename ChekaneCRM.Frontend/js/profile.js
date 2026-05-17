@@ -1,4 +1,3 @@
-//главная стр
 console.log('profile.js загружен');
 
 async function renderProfile() {
@@ -9,6 +8,13 @@ async function renderProfile() {
     }
     
     const app = document.getElementById('app');
+    
+    // Загружаем текущую тему для отображения
+    const savedTheme = localStorage.getItem('spotalk_theme') || 'default';
+    let currentThemeName = 'Розовое сияние 💜';
+    if (window.THEMES && THEMES[savedTheme]) {
+        currentThemeName = THEMES[savedTheme].name;
+    }
     
     app.innerHTML = `
         <div style="max-width: 600px; margin: 0 auto;">
@@ -59,6 +65,20 @@ async function renderProfile() {
                         </button>
                     </div>
                 </form>
+                
+                <!-- КНОПКА СМЕНЫ ТЕМЫ - ДОБАВЛЕНА -->
+                <div style="margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid #d9b8ff; text-align: center;">
+                    <div style="margin-bottom: 0.5rem;">
+                        <span style="font-size: 0.9rem; color: #d9b8ff;">🎨 Текущая тема: <strong>${currentThemeName}</strong></span>
+                    </div>
+                    <button type="button" onclick="showThemeSelector()" 
+                            style="background: linear-gradient(135deg, #d9b8ff, #ff6b9d); 
+                                   padding: 0.8rem 2rem; border-radius: 30px; border: none; 
+                                   color: #000; font-weight: bold; cursor: pointer; width: 100%;">
+                        🎨 Сменить цветовую тему
+                    </button>
+                </div>
+                
                 <hr style="margin: 1rem 0; border-color: #d9b8ff;">
                 <p style="font-size: 0.8rem; color: #888; text-align: center;">
                     🔐 Ваша роль: <strong style="color: #d9b8ff;">${roleBadges[currentUser.roleId]}</strong>
