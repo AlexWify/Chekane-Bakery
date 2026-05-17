@@ -9,7 +9,11 @@ const savedCart = localStorage.getItem('cart');
 if (savedCart) {
     try { cart = JSON.parse(savedCart); } catch(e) {}
 }
-//changePage('products')
+
+// Загружаем сохранённую тему ПЕРЕД отрисовкой интерфейса
+if (typeof loadSavedTheme === 'function') {
+    loadSavedTheme();
+}
 
 // Глобальные функции для HTML
 window.changePage = changePage;
@@ -47,6 +51,16 @@ window.searchProducts = searchProducts;
 window.clearSearch = clearSearch;
 window.searchUsers = searchUsers;
 window.clearUserSearch = clearUserSearch;
+
+// Функции для тем (если скрипт ещё не загружен, но объявляем на всякий случай)
+window.showThemeSelector = window.showThemeSelector || function() {
+    if (typeof showThemeSelector === 'function') {
+        showThemeSelector();
+    } else {
+        console.warn('theme-switcher.js не загружен');
+        showToast('Система тем временно недоступна', 'warning');
+    }
+};
 
 //  СОЗДАНИЕ НЕОНОВОГО ФОНА 
 function createNeonBackground() {
