@@ -38,7 +38,10 @@ body {
 .logo { 
     font-size: 1.8rem; 
     font-weight: bold; 
-    color: var(--theme-primary);
+    background: linear-gradient(135deg, var(--theme-primary), var(--theme-secondary)); 
+    -webkit-background-clip: text; 
+    background-clip: text; 
+    color: transparent; 
     cursor: pointer; 
 }
 
@@ -182,32 +185,53 @@ button:hover, .btn:hover {
     border-radius: 15px; 
 }
 
-/* Hero секция на главной */
+/* Hero секция на главной - текст слева, картинки справа с одинаковыми отступами */
 .hero { 
     display: flex;
     justify-content: space-between;
     align-items: center;
     flex-wrap: wrap;
     padding: 3rem 2rem;
-    background: rgba(217,184,255,0.1);
+    background: linear-gradient(135deg, rgba(217,184,255,0.1), rgba(255,107,157,0.05));
     border-radius: 50px;
     margin-bottom: 3rem;
+    gap: 2rem;
 }
 
-.hero-left { flex: 1; min-width: 300px; }
-.hero-right { flex: 1; min-width: 300px; text-align: center; }
+.hero-left { 
+    flex: 1; 
+    min-width: 280px;
+    padding-left: 14rem;
+}
+
+.hero-right { 
+    flex: 1; 
+    min-width: 280px; 
+    text-align: center;
+    padding-right: 2rem;
+}
 
 .bakery-name { 
     font-size: 2.5rem; 
     font-weight: 800; 
     letter-spacing: 2px; 
-    color: var(--theme-primary);
+    background: linear-gradient(135deg, var(--theme-primary), var(--theme-secondary)); 
+    -webkit-background-clip: text; 
+    background-clip: text; 
+    color: transparent; 
     margin-bottom: 2rem; 
     line-height: 1.2; 
 }
 
-.hero-text { margin-bottom: 2rem; }
-.hero-line { font-size: 2rem; margin: 0.2rem 0; color: #fff; }
+.hero-text { 
+    margin-bottom: 2rem; 
+}
+
+.hero-line { 
+    font-size: 2rem; 
+    margin: 0.2rem 0; 
+    color: #fff; 
+}
 
 /* Неоновый рукописный шрифт */
 .neon-handwritten { 
@@ -225,10 +249,24 @@ button:hover, .btn:hover {
     to { text-shadow: 0 0 8px #ff6600, 0 0 16px #ff6600, 0 0 24px #ff6600, 0 0 40px #ff3300; }
 }
 
-/* Летающие продукты на главной */
-.hero-products { display: flex; gap: 2rem; justify-content: center; align-items: center; flex-wrap: wrap; margin-bottom: 2rem; }
-.product-item { text-align: center; transition: transform 0.3s; }
-.product-item:hover { transform: scale(1.05); }
+/* Летающие продукты */
+.hero-products { 
+    display: flex; 
+    gap: 2rem; 
+    justify-content: center; 
+    align-items: center; 
+    flex-wrap: wrap; 
+    margin-bottom: 2rem; 
+}
+
+.product-item { 
+    text-align: center; 
+    transition: transform 0.3s; 
+}
+
+.product-item:hover { 
+    transform: scale(1.05); 
+}
 
 .product-img { 
     width: 100px; 
@@ -239,7 +277,10 @@ button:hover, .btn:hover {
     box-shadow: 0 5px 15px rgba(0,0,0,0.3); 
 }
 
-.flying { animation: floatContinuous 3s ease-in-out infinite; }
+.flying { 
+    animation: floatContinuous 3s ease-in-out infinite; 
+}
+
 .product-item:nth-child(1) .flying { animation-delay: 0s; }
 .product-item:nth-child(2) .flying { animation-delay: 0.4s; }
 .product-item:nth-child(3) .flying { animation-delay: 0.8s; }
@@ -251,13 +292,12 @@ button:hover, .btn:hover {
 }
 
 .hero-slogan { 
-    font-size: 1.8rem; 
+    font-size: 1.5rem; 
     color: #fff; 
     margin-bottom: 2rem; 
-    line-height: 1.5; 
-    text-align: center; 
+    line-height: 1.4; 
     font-weight: bold; 
-    letter-spacing: 2px; 
+    letter-spacing: 1px; 
     text-shadow: 0 0 10px rgba(217,184,255,0.5); 
 }
 
@@ -265,8 +305,8 @@ button:hover, .btn:hover {
     background: var(--theme-primary);
     border: none; 
     border-radius: 50px; 
-    padding: 1rem 2.5rem; 
-    font-size: 1.3rem; 
+    padding: 0.8rem 2rem; 
+    font-size: 1.2rem; 
     font-weight: bold; 
     cursor: pointer; 
     transition: transform 0.3s; 
@@ -274,9 +314,64 @@ button:hover, .btn:hover {
     color: #000;
 }
 
-.hero-btn:hover { transform: scale(1.05); box-shadow: 0 0 25px var(--theme-primary); }
+.hero-btn:hover { 
+    transform: scale(1.05); 
+    box-shadow: 0 0 25px var(--theme-primary); 
+}
 
-/* Карточки функций на главной */
+/* Адаптив для мобильных */
+@media (max-width: 768px) {
+    .hero { 
+        flex-direction: column; 
+        text-align: center; 
+    }
+    .hero-left { 
+        text-align: center; 
+        margin-bottom: 2rem;
+        padding-left: 0;
+    }
+    .hero-right {
+        padding-right: 0;
+    }
+    .hero-line { 
+        font-size: 1.5rem; 
+    }
+    .neon-handwritten { 
+        font-size: 2rem; 
+    }
+    .bakery-name { 
+        font-size: 2rem; 
+    }
+    .hero-slogan { 
+        font-size: 1.2rem; 
+    }
+}
+
+/* Адаптив для мобильных */
+@media (max-width: 768px) {
+    .hero { 
+        flex-direction: column; 
+        text-align: center; 
+    }
+    .hero-left { 
+        text-align: center; 
+        margin-bottom: 2rem;
+    }
+    .hero-line { 
+        font-size: 1.5rem; 
+    }
+    .neon-handwritten { 
+        font-size: 2rem; 
+    }
+    .bakery-name { 
+        font-size: 2rem; 
+    }
+    .hero-slogan { 
+        font-size: 1.2rem; 
+    }
+}
+
+/* Карточки функций */
 .feature-grid { display: flex; gap: 2rem; justify-content: center; flex-wrap: wrap; margin-top: 2rem; }
 
 .feature-card { 
@@ -302,7 +397,10 @@ button:hover, .btn:hover {
 
 .auth-page h2 { 
     text-align: center; 
-    color: var(--theme-primary);
+    background: linear-gradient(135deg, var(--theme-primary), var(--theme-secondary)); 
+    -webkit-background-clip: text; 
+    background-clip: text; 
+    color: transparent; 
     margin-bottom: 1.5rem; 
 }
 
@@ -341,7 +439,7 @@ button:hover, .btn:hover {
     padding: 0.2rem 0.5rem; 
 }
 
-/* Таблицы пользователей и заказов */
+/* Таблицы */
 .users-table, .orders-table { 
     width: 100%; 
     border-collapse: collapse; 
@@ -414,7 +512,7 @@ textarea {
 input[type="checkbox"] { width: auto; margin-right: 0.5rem; }
 label { cursor: pointer; }
 
-/* Таблица заказов детальная */
+/* Детали заказов */
 .orders-table th, .orders-table td { padding: 1rem; text-align: left; border-bottom: 1px solid var(--theme-primary); vertical-align: top; }
 .order-products-list { display: flex; flex-direction: column; gap: 0.3rem; }
 .order-product-item { font-size: 0.9rem; color: var(--theme-text-muted); border-left: 2px solid var(--theme-primary); padding-left: 0.5rem; }
@@ -423,7 +521,6 @@ label { cursor: pointer; }
 #dateFilter { cursor: pointer; }
 #dateFilter::-webkit-calendar-picker-indicator { filter: invert(1); cursor: pointer; }
 
-/* Кнопка экспорта */
 .btn-export { background: #00b894; margin-left: 0.5rem; color: white; }
 .btn-export:hover { transform: scale(1.02); box-shadow: 0 0 10px rgba(0, 184, 148, 0.6); }
 
@@ -455,7 +552,7 @@ label { cursor: pointer; }
 .btn-add-to-cart { background: #00b894; padding: 0.8rem 1.5rem; font-size: 1rem; margin-right: 1rem; color: white; }
 .btn-edit { background: var(--theme-primary); padding: 0.8rem 1.5rem; font-size: 1rem; color: #000; }
 
-/* Неоновый фон с линиями и сердечками */
+/* Неоновый фон */
 .neon-bg {
     position: fixed;
     top: 0;
@@ -532,18 +629,14 @@ label { cursor: pointer; }
     z-index: 1;
 }
 
-/* Страница товаров */
 .products-page { background: var(--theme-bg); border-radius: 20px; padding: 1.5rem; margin: 1rem 0; }
 
-/* Адаптивность для мобильных устройств */
+/* Адаптивность */
 @media (max-width: 768px) {
     .navbar { flex-direction: column; text-align: center; }
     .nav-links { justify-content: center; }
-    .hero { flex-direction: column; text-align: center; }
-    .hero-left { text-align: center; }
     .bakery-name { font-size: 2rem; }
-    .hero-line { font-size: 1.5rem; }
-    .neon-handwritten { font-size: 2rem; }
+    .hero-line, .neon-handwritten { font-size: 2rem; }
     .product-card { width: 100%; max-width: 300px; margin: 0 auto; }
     .product-grid { justify-content: center; }
     .feature-grid { flex-direction: column; align-items: center; }
