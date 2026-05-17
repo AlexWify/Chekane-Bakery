@@ -1,3 +1,62 @@
+:root {
+    --theme-primary: #d9b8ff;
+    --theme-secondary: #ff6b9d;
+    --theme-accent: #d9b8ff;
+    --theme-bg: #0a0a0a;
+    --theme-card-bg: #1a1a2a;
+    --theme-text: #eeeeee;
+    --theme-text-muted: #cccccc;
+}
+
+/* Заменяем статические цвета на переменные */
+
+.navbar {
+    background: var(--theme-bg);
+    border-bottom: 2px solid var(--theme-primary);
+}
+
+.logo, .hero h1, .auth-page h2 {
+    background: linear-gradient(135deg, var(--theme-primary), var(--theme-secondary));
+    -webkit-background-clip: text;
+    background-clip: text;
+}
+
+.nav-link:hover { color: var(--theme-primary); }
+.nav-link.active {
+    background: linear-gradient(135deg, var(--theme-primary), var(--theme-secondary));
+}
+
+.role-badge {
+    background: linear-gradient(135deg, var(--theme-primary), var(--theme-secondary));
+}
+
+.btn-login, .btn-register, .hero-btn, button, .btn {
+    background: linear-gradient(135deg, var(--theme-primary), var(--theme-secondary));
+}
+
+.product-card {
+    background: var(--theme-card-bg);
+    border: 2px solid var(--theme-primary);
+}
+
+.price { color: var(--theme-primary); }
+
+.cart-table, .users-table, .orders-table {
+    background: var(--theme-card-bg);
+}
+
+.cart-table th, .users-table th, .orders-table th {
+    background: linear-gradient(135deg, var(--theme-primary), var(--theme-secondary));
+    color: #000;
+}
+
+.feature-card, .auth-page {
+    background: var(--theme-card-bg);
+    border: 1px solid var(--theme-primary);
+}
+
+.feature-card h3 { color: var(--theme-primary); }
+
 * { margin: 0; padding: 0; box-sizing: border-box; }
 body { background: #000000; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: #eee; min-height: 100vh; }
 
