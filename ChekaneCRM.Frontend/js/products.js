@@ -2,26 +2,18 @@ console.log('products.js загружен');
 
 let editingProductId = null;
 let allProducts = [];
-let currentCategoryFilter = 'all';
+let currentCategoryFilter = 'all'; // Добавляем переменную для текущей категории
 
-// Функция для получения фото товара (если загружено своё - используем его)
-function getProductImage(product) {
-    if (product.customImage && product.customImage.startsWith('data:image')) {
-        return product.customImage;
-    }
-    if (product.customImage && product.customImage.startsWith('blob:')) {
-        return product.customImage;
-    }
-    // Если нет своего фото - показываем стандартное по категории
-    const category = (product.category || '').toLowerCase();
-    if (category.includes('хлеб') || category.includes('bread')) return '/images/bread.jpg';
-    if (category.includes('торт') || category.includes('cake')) return '/images/cake.jpg';
-    if (category.includes('выпечка') || category.includes('pastry') || category.includes('булочки')) return '/images/pastry.jpg';
-    if (category.includes('печенье') || category.includes('cookie')) return '/images/gir.png';
+function getProductImage(category) {
+    const categoryLower = (category || '').toLowerCase();
+    if (categoryLower.includes('хлеб') || categoryLower.includes('bread')) return '/images/bread.jpg';
+    if (categoryLower.includes('торт') || categoryLower.includes('cake')) return '/images/cake.jpg';
+    if (categoryLower.includes('выпечка') || categoryLower.includes('pastry') || categoryLower.includes('булочки')) return '/images/pastry.jpg';
+    if (categoryLower.includes('печенье') || categoryLower.includes('cookie')) return '/images/gir.png';
     return '/images/default.jpg';
 }
 
-// Получение уникальных категорий
+// Функция для получения уникальных категорий из товаров
 function getUniqueCategories(products) {
     const categories = new Set();
     products.forEach(product => {
@@ -32,9 +24,11 @@ function getUniqueCategories(products) {
     return Array.from(categories).sort();
 }
 
-// Фильтрация товаров
+// Функция для фильтрации товаров по категории и поиску
 function filterProducts(products, searchTerm, category) {
     let filtered = products;
+    
+    // Фильтр по поиску
     if (searchTerm && searchTerm.trim() !== '') {
         const term = searchTerm.toLowerCase().trim();
         filtered = filtered.filter(p => 
@@ -43,22 +37,27 @@ function filterProducts(products, searchTerm, category) {
             (p.description && p.description.toLowerCase().includes(term))
         );
     }
+    
+    // Фильтр по категории
     if (category && category !== 'all') {
         filtered = filtered.filter(p => p.category === category);
     }
+    
     return filtered;
 }
 
-// Рендер товаров
 async function renderProducts(searchTerm = '', category = null) {
     const products = await loadProducts();
     allProducts = products;
     
+    // Если передана новая категория, обновляем currentCategoryFilter
     if (category !== null) {
         currentCategoryFilter = category;
     }
     
+    // Получаем уникальные категории для кнопок фильтра
     const categories = getUniqueCategories(products);
+    
     let filteredProducts = filterProducts(products, searchTerm, currentCategoryFilter);
     
     const app = document.getElementById('app');
@@ -67,30 +66,32 @@ async function renderProducts(searchTerm = '', category = null) {
     app.innerHTML = `
         <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; margin-bottom: 2rem;">
             <h2>🍞 Каталог товаров</h2>
-            ${canManage ? `<button onclick="showAddProductForm()" style="background: var(--theme-primary);">➕ Добавить товар</button>` : ''}
+            ${canManage ? `<button onclick="showAddProductForm()" style="background: linear-gradient(135deg, #00b894, #009432);">➕ Добавить товар</button>` : ''}
         </div>
         
+        <!-- Поиск -->
         <div style="margin-bottom: 1.5rem; position: relative;">
             <div style="display: flex; gap: 0.5rem;">
-                <input type="text" id="searchInput" placeholder="🔍 Поиск товаров..." style="flex: 1; padding: 0.8rem; background: #1a1a1a; border: 2px solid var(--theme-primary); border-radius: 30px; color: white;">
-                <button onclick="searchProducts()" style="background: var(--theme-primary); padding: 0.8rem 1.5rem; border-radius: 30px;">🔍 Найти</button>
+                <input type="text" id="searchInput" placeholder="🔍 Поиск товаров..." style="flex: 1; padding: 0.8rem; background: #1a1a1a; border: 2px solid #d9b8ff; border-radius: 30px; color: white;">
+                <button onclick="searchProducts()" style="background: linear-gradient(135deg, #d9b8ff, #ff6b9d); padding: 0.8rem 1.5rem; border-radius: 30px;">🔍 Найти</button>
                 <button onclick="clearSearch()" style="background: #666; padding: 0.8rem 1.5rem; border-radius: 30px;">❌ Очистить</button>
             </div>
-            <div id="searchSuggestions" style="position: absolute; top: 100%; left: 0; right: 0; background: #1a1a1a; border: 1px solid var(--theme-primary); border-radius: 15px; max-height: 300px; overflow-y: auto; z-index: 1000; display: none;"></div>
+            <div id="searchSuggestions" style="position: absolute; top: 100%; left: 0; right: 0; background: #1a1a1a; border: 1px solid #d9b8ff; border-radius: 15px; max-height: 300px; overflow-y: auto; z-index: 1000; display: none;"></div>
         </div>
         
+        <!-- Фильтр по категориям -->
         <div style="margin-bottom: 1.5rem;">
             <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; align-items: center;">
-                <span style="color: var(--theme-primary); font-weight: bold;">📁 Фильтр по категориям:</span>
+                <span style="color: #d9b8ff; font-weight: bold;">📁 Фильтр по категориям:</span>
                 <button onclick="filterByCategory('all')" 
-                        style="background: ${currentCategoryFilter === 'all' ? 'var(--theme-primary)' : '#1a1a1a'}; 
-                               border: 1px solid var(--theme-primary); padding: 0.4rem 1rem; border-radius: 20px; cursor: pointer; color: ${currentCategoryFilter === 'all' ? '#000' : 'var(--theme-primary)'};">
+                        style="background: ${currentCategoryFilter === 'all' ? 'linear-gradient(135deg, #d9b8ff, #ff6b9d)' : '#1a1a1a'}; 
+                               border: 1px solid #d9b8ff; padding: 0.4rem 1rem; border-radius: 20px; cursor: pointer; color: ${currentCategoryFilter === 'all' ? '#000' : '#d9b8ff'};">
                     Все
                 </button>
                 ${categories.map(cat => `
                     <button onclick="filterByCategory('${escapeHtml(cat)}')" 
-                            style="background: ${currentCategoryFilter === cat ? 'var(--theme-primary)' : '#1a1a1a'}; 
-                                   border: 1px solid var(--theme-primary); padding: 0.4rem 1rem; border-radius: 20px; cursor: pointer; color: ${currentCategoryFilter === cat ? '#000' : 'var(--theme-primary)'};">
+                            style="background: ${currentCategoryFilter === cat ? 'linear-gradient(135deg, #d9b8ff, #ff6b9d)' : '#1a1a1a'}; 
+                                   border: 1px solid #d9b8ff; padding: 0.4rem 1rem; border-radius: 20px; cursor: pointer; color: ${currentCategoryFilter === cat ? '#000' : '#d9b8ff'};">
                         ${escapeHtml(cat)}
                     </button>
                 `).join('')}
@@ -114,7 +115,7 @@ async function renderProducts(searchTerm = '', category = null) {
     resultInfo.innerHTML = `Найдено: ${filteredProducts.length} товаров${searchTerm ? ` по запросу "${searchTerm}"` : ''}${filterText}`;
     
     grid.innerHTML = filteredProducts.map(p => {
-        const imagePath = getProductImage(p);
+        const imagePath = getProductImage(p.category);
         return `
             <div class="product-card ${!p.isAvailable ? 'unavailable' : ''}">
                 <div style="position: relative;">
@@ -126,10 +127,10 @@ async function renderProducts(searchTerm = '', category = null) {
                         </div>
                     ` : ''}
                 </div>
-                <h3 style="cursor: pointer; color: var(--theme-primary);" onclick="openProductDetails(${p.id})">${escapeHtml(p.name)}</h3>
+                <h3 style="cursor: pointer; color: #d9b8ff;" onclick="openProductDetails(${p.id})">${escapeHtml(p.name)}</h3>
                 <div class="price">${p.price} ₽</div>
-                <div style="color: var(--theme-primary);">📁 ${escapeHtml(p.category || 'Без категории')}</div>
-                <div style="color: var(--theme-primary);">${p.isAvailable ? '✅ В наличии' : '❌ Нет в наличии'}</div>
+                <div style="color: #d9b8ff;">📁 ${escapeHtml(p.category || 'Без категории')}</div>
+                <div style="color: #d9b8ff;">${p.isAvailable ? '✅ В наличии' : '❌ Нет в наличии'}</div>
                 <div style="display: flex; gap: 0.5rem; flex-wrap: wrap; margin-top: 0.5rem;">
                     <button onclick="openProductDetails(${p.id})">🔍 Подробнее</button>
                     ${p.isAvailable ? `<button onclick="addToCart({id:${p.id}, name:'${escapeHtml(p.name)}', price:${p.price}})">🛒 В корзину</button>` : ''}
@@ -148,7 +149,7 @@ async function renderProducts(searchTerm = '', category = null) {
     }
 }
 
-// Фильтр по категории
+// Функция фильтрации по категории
 function filterByCategory(category) {
     currentCategoryFilter = category;
     const searchInput = document.getElementById('searchInput');
@@ -156,20 +157,19 @@ function filterByCategory(category) {
     renderProducts(searchTerm, category);
 }
 
-// Поиск товаров
+// Функция поиска с сохранением фильтра категории
 function searchProducts() {
     const searchInput = document.getElementById('searchInput');
     renderProducts(searchInput ? searchInput.value : '', currentCategoryFilter);
 }
 
-// Очистка поиска
+// Функция очистки поиска (фильтр категории сохраняется)
 function clearSearch() {
     const searchInput = document.getElementById('searchInput');
     if (searchInput) searchInput.value = '';
     renderProducts('', currentCategoryFilter);
 }
 
-// Показ подсказок
 function showSuggestions() {
     const searchInput = document.getElementById('searchInput');
     const suggestionsDiv = document.getElementById('searchSuggestions');
@@ -209,7 +209,7 @@ function selectSuggestion(productName) {
     searchProducts();
 }
 
-// Скрытие подсказок при клике вне
+// Скрываем подсказки при клике вне
 document.addEventListener('click', function(e) {
     const suggestionsDiv = document.getElementById('searchSuggestions');
     const searchInput = document.getElementById('searchInput');
@@ -218,7 +218,6 @@ document.addEventListener('click', function(e) {
     }
 });
 
-// Открыть детали товара
 async function openProductDetails(productId) {
     const products = await loadProducts();
     const product = products.find(p => p.id === productId);
@@ -230,20 +229,19 @@ async function openProductDetails(productId) {
     
     const app = document.getElementById('app');
     const canManage = currentUser && (currentUser.roleId === 1 || currentUser.roleId === 3);
-    const productImage = getProductImage(product);
     
     app.innerHTML = `
         <button onclick="renderProducts()" class="btn" style="margin-bottom: 1rem;">← Назад к товарам</button>
-        <div style="background: #ffe4f0; border-radius: 30px; padding: 2rem; color: #4a006a;">
+        <div style="background: linear-gradient(135deg, #ffe4f0, #ffd6e8); border-radius: 30px; padding: 2rem; color: #4a006a;">
             <div style="display: flex; flex-wrap: wrap; gap: 2rem;">
                 <div style="flex: 1; min-width: 300px;">
-                    <img src="${productImage}" alt="${escapeHtml(product.name)}" style="width: 100%; border-radius: 20px;">
+                    <img src="${getProductImage(product.category)}" alt="${escapeHtml(product.name)}" style="width: 100%; border-radius: 20px;">
                 </div>
                 <div style="flex: 2;">
                     <h1 style="font-size: 2rem;">${escapeHtml(product.name)}</h1>
                     <div class="price" style="font-size: 2rem;">${product.price} ₽</div>
                     <div style="margin: 1rem 0;">
-                        <span class="badge" style="color: var(--theme-primary);">📁 ${escapeHtml(product.category || 'Без категории')}</span>
+                        <span class="badge" style="color: #d9b8ff;">📁 ${escapeHtml(product.category || 'Без категории')}</span>
                         <span class="badge ${product.isAvailable ? 'badge-success' : 'badge-danger'}">${product.isAvailable ? '✅ В наличии' : '❌ Нет в наличии'}</span>
                     </div>
                     <div style="margin: 1rem 0;">
@@ -251,12 +249,12 @@ async function openProductDetails(productId) {
                         <p>${escapeHtml(product.description || 'Описание отсутствует')}</p>
                     </div>
                     <div style="margin: 1rem 0;">
-                        <h3 style="color: var(--theme-primary);">🥗 Пищевая ценность (на 100г)</h3>
+                        <h3 style="color: #d9b8ff;">🥗 Пищевая ценность (на 100г)</h3>
                         <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
-                            <div style="background: #1a1a1a; border-radius: 15px; padding: 0.8rem 1.2rem; text-align: center;"><span style="font-size: 1.5rem; font-weight: bold; color: var(--theme-primary);">${product.proteins || 0}</span><br><span style="font-size: 0.7rem; color: var(--theme-primary);">Белки (г)</span></div>
-                            <div style="background: #1a1a1a; border-radius: 15px; padding: 0.8rem 1.2rem; text-align: center;"><span style="font-size: 1.5rem; font-weight: bold; color: var(--theme-primary);">${product.fats || 0}</span><br><span style="font-size: 0.7rem; color: var(--theme-primary);">Жиры (г)</span></div>
-                            <div style="background: #1a1a1a; border-radius: 15px; padding: 0.8rem 1.2rem; text-align: center;"><span style="font-size: 1.5rem; font-weight: bold; color: var(--theme-primary);">${product.carbohydrates || 0}</span><br><span style="font-size: 0.7rem; color: var(--theme-primary);">Углеводы (г)</span></div>
-                            <div style="background: #1a1a1a; border-radius: 15px; padding: 0.8rem 1.2rem; text-align: center;"><span style="font-size: 1.5rem; font-weight: bold; color: var(--theme-primary);">${product.calories || 0}</span><br><span style="font-size: 0.7rem; color: var(--theme-primary);">Ккал</span></div>
+                            <div style="background: #1a1a1a; border-radius: 15px; padding: 0.8rem 1.2rem; text-align: center;"><span style="font-size: 1.5rem; font-weight: bold; color: #d9b8ff;">${product.proteins || 0}</span><br><span style="font-size: 0.7rem; color: #d9b8ff;">Белки (г)</span></div>
+                            <div style="background: #1a1a1a; border-radius: 15px; padding: 0.8rem 1.2rem; text-align: center;"><span style="font-size: 1.5rem; font-weight: bold; color: #d9b8ff;">${product.fats || 0}</span><br><span style="font-size: 0.7rem; color: #d9b8ff;">Жиры (г)</span></div>
+                            <div style="background: #1a1a1a; border-radius: 15px; padding: 0.8rem 1.2rem; text-align: center;"><span style="font-size: 1.5rem; font-weight: bold; color: #d9b8ff;">${product.carbohydrates || 0}</span><br><span style="font-size: 0.7rem; color: #d9b8ff;">Углеводы (г)</span></div>
+                            <div style="background: #1a1a1a; border-radius: 15px; padding: 0.8rem 1.2rem; text-align: center;"><span style="font-size: 1.5rem; font-weight: bold; color: #d9b8ff;">${product.calories || 0}</span><br><span style="font-size: 0.7rem; color: #d9b8ff;">Ккал</span></div>
                         </div>
                     </div>
                     <div style="margin: 1rem 0;">
@@ -264,8 +262,8 @@ async function openProductDetails(productId) {
                         <p>${escapeHtml(product.ingredients || 'Состав не указан')}</p>
                     </div>
                     <div style="margin-top: 2rem;">
-                        ${product.isAvailable ? `<button onclick="addToCart({id:${product.id}, name:'${escapeHtml(product.name)}', price:${product.price}})" style="background: #00b894; padding: 0.8rem 1.5rem; border-radius: 30px; margin-right: 1rem; color: white;">🛒 Добавить в корзину</button>` : ''}
-                        ${canManage ? `<button onclick="editProduct(${product.id})" style="background: var(--theme-primary); padding: 0.8rem 1.5rem; border-radius: 30px;">✏️ Редактировать</button>` : ''}
+                        ${product.isAvailable ? `<button onclick="addToCart({id:${product.id}, name:'${escapeHtml(product.name)}', price:${product.price}})" style="background: linear-gradient(135deg, #00b894, #009432); padding: 0.8rem 1.5rem; border-radius: 30px; margin-right: 1rem;">🛒 Добавить в корзину</button>` : ''}
+                        ${canManage ? `<button onclick="editProduct(${product.id})" style="background: linear-gradient(135deg, #d9b8ff, #ff6b9d); padding: 0.8rem 1.5rem; border-radius: 30px;">✏️ Редактировать</button>` : ''}
                     </div>
                 </div>
             </div>
@@ -273,7 +271,6 @@ async function openProductDetails(productId) {
     `;
 }
 
-// Показать форму добавления товара (с загрузкой фото)
 function showAddProductForm() {
     editingProductId = null;
     document.getElementById('app').innerHTML = `
@@ -281,50 +278,33 @@ function showAddProductForm() {
             <h2>➕ Добавление товара</h2>
             <button onclick="renderProducts()" class="btn">◀ Назад к товарам</button>
         </div>
-        <div style="max-width: 700px; margin: 0 auto; background: #0a0a0a; padding: 2rem; border-radius: 25px; border: 2px solid var(--theme-primary);">
+        <div style="max-width: 700px; margin: 0 auto; background: #0a0a0a; padding: 2rem; border-radius: 25px; border: 2px solid #d9b8ff;">
             <form id="productForm">
-                <h3>🖼️ Фото товара</h3>
-                <div style="text-align: center; margin-bottom: 1rem;">
-                    <div id="imagePreviewContainer" style="margin-bottom: 0.5rem;">
-                        <img id="imagePreview" src="/images/default.jpg" alt="Предпросмотр" style="width: 150px; height: 150px; object-fit: cover; border-radius: 15px; border: 2px solid var(--theme-primary);">
-                    </div>
-                    <input type="file" id="productImageUpload" accept="image/*" style="display: none;">
-                    <button type="button" onclick="document.getElementById('productImageUpload').click()" style="background: var(--theme-primary); margin-top: 0;">📷 Выбрать фото</button>
-                    <button type="button" onclick="clearImagePreview()" style="background: #666; margin-left: 0.5rem;">🗑️ Удалить фото</button>
-                    <p style="font-size: 0.7rem; color: #888; margin-top: 0.3rem;">* Если фото не выбрано, будет использовано стандартное по категории</p>
-                </div>
-                
                 <h3>Основная информация</h3>
-                <input type="text" id="productName" placeholder="Название товара" required style="width:100%; padding:0.8rem; margin-bottom:1rem; background:#1a1a1a; border:1px solid var(--theme-primary); border-radius:12px; color:white;">
-                <input type="number" id="productPrice" placeholder="Цена (₽)" required style="width:100%; padding:0.8rem; margin-bottom:1rem; background:#1a1a1a; border:1px solid var(--theme-primary); border-radius:12px; color:white;">
-                <input type="text" id="productCategory" placeholder="Категория" list="categories" style="width:100%; padding:0.8rem; margin-bottom:1rem; background:#1a1a1a; border:1px solid var(--theme-primary); border-radius:12px; color:white;">
+                <input type="text" id="productName" placeholder="Название товара" required style="width:100%; padding:0.8rem; margin-bottom:1rem; background:#1a1a1a; border:1px solid #d9b8ff; border-radius:12px; color:white;">
+                <input type="number" id="productPrice" placeholder="Цена (₽)" required style="width:100%; padding:0.8rem; margin-bottom:1rem; background:#1a1a1a; border:1px solid #d9b8ff; border-radius:12px; color:white;">
+                <input type="text" id="productCategory" placeholder="Категория" list="categories" style="width:100%; padding:0.8rem; margin-bottom:1rem; background:#1a1a1a; border:1px solid #d9b8ff; border-radius:12px; color:white;">
                 <datalist id="categories"><option value="Хлеб"><option value="Торт"><option value="Выпечка"><option value="Печенье"></datalist>
-                <textarea id="productDescription" rows="3" placeholder="Описание товара" style="width:100%; padding:0.8rem; margin-bottom:1rem; background:#1a1a1a; border:1px solid var(--theme-primary); border-radius:12px; color:white;"></textarea>
+                <textarea id="productDescription" rows="3" placeholder="Описание товара" style="width:100%; padding:0.8rem; margin-bottom:1rem; background:#1a1a1a; border:1px solid #d9b8ff; border-radius:12px; color:white;"></textarea>
                 
                 <h3>🥗 Пищевая ценность (на 100г)</h3>
                 <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
-                    <input type="number" id="productProteins" placeholder="Белки (г)" step="0.1" style="flex:1; padding:0.8rem; background:#1a1a1a; border:1px solid var(--theme-primary); border-radius:12px; color:white;">
-                    <input type="number" id="productFats" placeholder="Жиры (г)" step="0.1" style="flex:1; padding:0.8rem; background:#1a1a1a; border:1px solid var(--theme-primary); border-radius:12px; color:white;">
-                    <input type="number" id="productCarbohydrates" placeholder="Углеводы (г)" step="0.1" style="flex:1; padding:0.8rem; background:#1a1a1a; border:1px solid var(--theme-primary); border-radius:12px; color:white;">
-                    <input type="number" id="productCalories" placeholder="Ккал" step="1" style="flex:1; padding:0.8rem; background:#1a1a1a; border:1px solid var(--theme-primary); border-radius:12px; color:white;">
+                    <input type="number" id="productProteins" placeholder="Белки (г)" step="0.1" style="flex:1; padding:0.8rem; background:#1a1a1a; border:1px solid #d9b8ff; border-radius:12px; color:white;">
+                    <input type="number" id="productFats" placeholder="Жиры (г)" step="0.1" style="flex:1; padding:0.8rem; background:#1a1a1a; border:1px solid #d9b8ff; border-radius:12px; color:white;">
+                    <input type="number" id="productCarbohydrates" placeholder="Углеводы (г)" step="0.1" style="flex:1; padding:0.8rem; background:#1a1a1a; border:1px solid #d9b8ff; border-radius:12px; color:white;">
+                    <input type="number" id="productCalories" placeholder="Ккал" step="1" style="flex:1; padding:0.8rem; background:#1a1a1a; border:1px solid #d9b8ff; border-radius:12px; color:white;">
                 </div>
                 
                 <h3>🥄 Состав</h3>
-                <textarea id="productIngredients" rows="3" placeholder="Состав продукта" style="width:100%; padding:0.8rem; margin-bottom:1rem; background:#1a1a1a; border:1px solid var(--theme-primary); border-radius:12px; color:white;"></textarea>
+                <textarea id="productIngredients" rows="3" placeholder="Состав продукта" style="width:100%; padding:0.8rem; margin-bottom:1rem; background:#1a1a1a; border:1px solid #d9b8ff; border-radius:12px; color:white;"></textarea>
                 
                 <div style="margin: 1rem 0;">
                     <label><input type="checkbox" id="productIsAvailable" checked> Товар в наличии</label>
                 </div>
-                <button type="submit" style="background: var(--theme-primary); padding: 0.8rem; border-radius: 30px; width:100%;">💾 Сохранить товар</button>
+                <button type="submit" style="background: linear-gradient(135deg, #00b894, #009432); padding: 0.8rem; border-radius: 30px; width:100%;">💾 Сохранить товар</button>
             </form>
         </div>
     `;
-    
-    // Обработчик загрузки фото
-    const imageUpload = document.getElementById('productImageUpload');
-    if (imageUpload) {
-        imageUpload.addEventListener('change', handleImagePreview);
-    }
     
     const form = document.getElementById('productForm');
     form.onsubmit = async (e) => {
@@ -333,37 +313,6 @@ function showAddProductForm() {
     };
 }
 
-// Обработчик предпросмотра фото
-let currentImageData = null;
-
-function handleImagePreview(e) {
-    const file = e.target.files[0];
-    if (file && file.type.startsWith('image/')) {
-        const reader = new FileReader();
-        reader.onload = function(event) {
-            currentImageData = event.target.result;
-            const preview = document.getElementById('imagePreview');
-            if (preview) {
-                preview.src = currentImageData;
-            }
-        };
-        reader.readAsDataURL(file);
-    }
-}
-
-function clearImagePreview() {
-    currentImageData = null;
-    const preview = document.getElementById('imagePreview');
-    if (preview) {
-        preview.src = '/images/default.jpg';
-    }
-    const imageUpload = document.getElementById('productImageUpload');
-    if (imageUpload) {
-        imageUpload.value = '';
-    }
-}
-
-// Редактирование товара (с загрузкой фото)
 async function editProduct(productId) {
     editingProductId = productId;
     const products = await loadProducts();
@@ -374,60 +323,39 @@ async function editProduct(productId) {
         return;
     }
     
-    // Если есть сохранённое фото - показываем его
-    const existingImage = product.customImage || getProductImage(product);
-    currentImageData = product.customImage || null;
-    
     document.getElementById('app').innerHTML = `
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
             <h2>✏️ Редактирование товара</h2>
             <button onclick="renderProducts()" class="btn">◀ Назад к товарам</button>
         </div>
-        <div style="max-width: 700px; margin: 0 auto; background: #0a0a0a; padding: 2rem; border-radius: 25px; border: 2px solid var(--theme-primary);">
+        <div style="max-width: 700px; margin: 0 auto; background: #0a0a0a; padding: 2rem; border-radius: 25px; border: 2px solid #d9b8ff;">
             <form id="productForm">
-                <h3>🖼️ Фото товара</h3>
-                <div style="text-align: center; margin-bottom: 1rem;">
-                    <div id="imagePreviewContainer" style="margin-bottom: 0.5rem;">
-                        <img id="imagePreview" src="${existingImage}" alt="Предпросмотр" style="width: 150px; height: 150px; object-fit: cover; border-radius: 15px; border: 2px solid var(--theme-primary);">
-                    </div>
-                    <input type="file" id="productImageUpload" accept="image/*" style="display: none;">
-                    <button type="button" onclick="document.getElementById('productImageUpload').click()" style="background: var(--theme-primary); margin-top: 0;">📷 Выбрать новое фото</button>
-                    <button type="button" onclick="clearImagePreview()" style="background: #666; margin-left: 0.5rem;">🗑️ Удалить фото</button>
-                    <p style="font-size: 0.7rem; color: #888; margin-top: 0.3rem;">* Если фото не выбрано, будет использовано стандартное по категории</p>
-                </div>
-                
                 <h3>Основная информация</h3>
-                <input type="text" id="productName" value="${escapeHtml(product.name)}" required style="width:100%; padding:0.8rem; margin-bottom:1rem; background:#1a1a1a; border:1px solid var(--theme-primary); border-radius:12px; color:white;">
-                <input type="number" id="productPrice" value="${product.price}" required style="width:100%; padding:0.8rem; margin-bottom:1rem; background:#1a1a1a; border:1px solid var(--theme-primary); border-radius:12px; color:white;">
-                <input type="text" id="productCategory" value="${escapeHtml(product.category || '')}" list="categories" style="width:100%; padding:0.8rem; margin-bottom:1rem; background:#1a1a1a; border:1px solid var(--theme-primary); border-radius:12px; color:white;">
+                <input type="text" id="productName" value="${escapeHtml(product.name)}" required style="width:100%; padding:0.8rem; margin-bottom:1rem; background:#1a1a1a; border:1px solid #d9b8ff; border-radius:12px; color:white;">
+                <input type="number" id="productPrice" value="${product.price}" required style="width:100%; padding:0.8rem; margin-bottom:1rem; background:#1a1a1a; border:1px solid #d9b8ff; border-radius:12px; color:white;">
+                <input type="text" id="productCategory" value="${escapeHtml(product.category || '')}" list="categories" style="width:100%; padding:0.8rem; margin-bottom:1rem; background:#1a1a1a; border:1px solid #d9b8ff; border-radius:12px; color:white;">
                 <datalist id="categories"><option value="Хлеб"><option value="Торт"><option value="Выпечка"><option value="Печенье"></datalist>
-                <textarea id="productDescription" rows="3" style="width:100%; padding:0.8rem; margin-bottom:1rem; background:#1a1a1a; border:1px solid var(--theme-primary); border-radius:12px; color:white;">${escapeHtml(product.description || '')}</textarea>
+                <textarea id="productDescription" rows="3" style="width:100%; padding:0.8rem; margin-bottom:1rem; background:#1a1a1a; border:1px solid #d9b8ff; border-radius:12px; color:white;">${escapeHtml(product.description || '')}</textarea>
                 
                 <h3>🥗 Пищевая ценность (на 100г)</h3>
                 <div style="display: flex; gap: 1rem; flex-wrap: wrap;">
-                    <input type="number" id="productProteins" value="${product.proteins || 0}" step="0.1" style="flex:1; padding:0.8rem; background:#1a1a1a; border:1px solid var(--theme-primary); border-radius:12px; color:white;">
-                    <input type="number" id="productFats" value="${product.fats || 0}" step="0.1" style="flex:1; padding:0.8rem; background:#1a1a1a; border:1px solid var(--theme-primary); border-radius:12px; color:white;">
-                    <input type="number" id="productCarbohydrates" value="${product.carbohydrates || 0}" step="0.1" style="flex:1; padding:0.8rem; background:#1a1a1a; border:1px solid var(--theme-primary); border-radius:12px; color:white;">
-                    <input type="number" id="productCalories" value="${product.calories || 0}" step="1" style="flex:1; padding:0.8rem; background:#1a1a1a; border:1px solid var(--theme-primary); border-radius:12px; color:white;">
+                    <input type="number" id="productProteins" value="${product.proteins || 0}" step="0.1" style="flex:1; padding:0.8rem; background:#1a1a1a; border:1px solid #d9b8ff; border-radius:12px; color:white;">
+                    <input type="number" id="productFats" value="${product.fats || 0}" step="0.1" style="flex:1; padding:0.8rem; background:#1a1a1a; border:1px solid #d9b8ff; border-radius:12px; color:white;">
+                    <input type="number" id="productCarbohydrates" value="${product.carbohydrates || 0}" step="0.1" style="flex:1; padding:0.8rem; background:#1a1a1a; border:1px solid #d9b8ff; border-radius:12px; color:white;">
+                    <input type="number" id="productCalories" value="${product.calories || 0}" step="1" style="flex:1; padding:0.8rem; background:#1a1a1a; border:1px solid #d9b8ff; border-radius:12px; color:white;">
                 </div>
                 
                 <h3>🥄 Состав</h3>
-                <textarea id="productIngredients" rows="3" style="width:100%; padding:0.8rem; margin-bottom:1rem; background:#1a1a1a; border:1px solid var(--theme-primary); border-radius:12px; color:white;">${escapeHtml(product.ingredients || '')}</textarea>
+                <textarea id="productIngredients" rows="3" style="width:100%; padding:0.8rem; margin-bottom:1rem; background:#1a1a1a; border:1px solid #d9b8ff; border-radius:12px; color:white;">${escapeHtml(product.ingredients || '')}</textarea>
                 
                 <div style="margin: 1rem 0;">
                     <label><input type="checkbox" id="productIsAvailable" ${product.isAvailable ? 'checked' : ''}> Товар в наличии</label>
                 </div>
-                <button type="submit" style="background: var(--theme-primary); padding: 0.8rem; border-radius: 30px; width:100%;">💾 Обновить товар</button>
+                <button type="submit" style="background: linear-gradient(135deg, #00b894, #009432); padding: 0.8rem; border-radius: 30px; width:100%;">💾 Обновить товар</button>
                 <button type="button" onclick="deleteProduct(${productId})" style="background: #ff4444; padding: 0.8rem; border-radius: 30px; width:100%; margin-top: 0.5rem;">🗑️ Удалить товар</button>
             </form>
         </div>
     `;
-    
-    // Обработчик загрузки фото
-    const imageUpload = document.getElementById('productImageUpload');
-    if (imageUpload) {
-        imageUpload.addEventListener('change', handleImagePreview);
-    }
     
     const form = document.getElementById('productForm');
     form.onsubmit = async (e) => {
@@ -436,7 +364,6 @@ async function editProduct(productId) {
     };
 }
 
-// Создание товара с фото
 async function createProduct() {
     const productData = {
         name: document.getElementById('productName').value,
@@ -448,8 +375,7 @@ async function createProduct() {
         carbohydrates: parseFloat(document.getElementById('productCarbohydrates').value) || 0,
         calories: parseInt(document.getElementById('productCalories').value) || 0,
         ingredients: document.getElementById('productIngredients').value,
-        isAvailable: document.getElementById('productIsAvailable').checked,
-        customImage: currentImageData || null
+        isAvailable: document.getElementById('productIsAvailable').checked
     };
     
     if (!productData.name || !productData.price) {
@@ -460,14 +386,12 @@ async function createProduct() {
     try {
         await apiRequest('/products', 'POST', productData);
         showToast('✅ Товар добавлен!', 'success');
-        currentImageData = null;
         renderProducts();
     } catch (error) {
         showToast('❌ Ошибка: ' + error.message, 'error');
     }
 }
 
-// Обновление товара с фото
 async function updateProduct(productId) {
     const productData = {
         name: document.getElementById('productName').value,
@@ -479,16 +403,14 @@ async function updateProduct(productId) {
         carbohydrates: parseFloat(document.getElementById('productCarbohydrates').value) || 0,
         calories: parseInt(document.getElementById('productCalories').value) || 0,
         ingredients: document.getElementById('productIngredients').value,
-        isAvailable: document.getElementById('productIsAvailable').checked,
-        customImage: currentImageData || null
+        isAvailable: document.getElementById('productIsAvailable').checked  //  ЭТО ДОЛЖНО РАБОТАТЬ!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! через боль, неважно как 
     };
     
-    console.log('Отправка данных:', productData);
+    console.log('Отправка isAvailable:', productData.isAvailable);
     
     try {
         await apiRequest(`/products/${productId}`, 'PUT', productData);
         showToast('✅ Товар обновлён!', 'success');
-        currentImageData = null;
         renderProducts();
     } catch (error) {
         showToast('❌ Ошибка: ' + error.message, 'error');
@@ -526,5 +448,3 @@ window.searchProducts = searchProducts;
 window.clearSearch = clearSearch;
 window.selectSuggestion = selectSuggestion;
 window.filterByCategory = filterByCategory;
-window.handleImagePreview = handleImagePreview;
-window.clearImagePreview = clearImagePreview;
